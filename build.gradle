@@ -1,0 +1,73 @@
+plugins {
+	id 'org.asciidoctor.convert' version '1.5.3'
+	id 'org.springframework.boot' version '2.1.5.RELEASE'
+	id 'groovy'
+	id 'com.palantir.docker' version '0.22.1'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+group = 'sanchez.sanchez.sergio'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+	developmentOnly
+	runtimeClasspath {
+		extendsFrom developmentOnly
+	}
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+ 	jcenter()
+	mavenCentral()
+}
+
+ext {
+	set('snippetsDir', file("build/generated-snippets"))
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
+	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.codehaus.groovy:groovy'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'io.projectreactor:reactor-test'
+	testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient'
+	testImplementation 'org.springframework.security:spring-security-test'
+}
+
+test {
+	outputs.dir snippetsDir
+}
+
+asciidoctor {
+	inputs.dir snippetsDir
+	dependsOn test
+}
+
+task unpack(type: Copy) {
+    dependsOn bootJar
+    from(zipTree(tasks.bootJar.outputs.files.singleFile))
+    into("build/dependency")
+}
+
+docker {
+    name "sergiosanchez11/${bootJar.baseName}:${bootJar.version}"
+    tag 'myRegistry', "sergiosanchez11/${bootJar.baseName}:${bootJar.version}"
+    copySpec.from(tasks.unpack.outputs).into("dependency")
+    dockerfile file('src/main/docker/Dockerfile')
+    buildArgs([BUILD_VERSION: 'version'])
+    labels(['key': 'value'])
+    pull true
+    noCache true
+}
