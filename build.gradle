@@ -3,6 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '2.1.5.RELEASE'
 	id 'groovy'
 	id 'com.palantir.docker' version '0.22.1'
+	id 'com.palantir.docker-compose' version '0.22.1'
 }
 
 apply plugin: 'io.spring.dependency-management'
@@ -19,6 +20,7 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+
 }
 
 repositories {
@@ -55,19 +57,23 @@ asciidoctor {
 	dependsOn test
 }
 
-task unpack(type: Copy) {
-    dependsOn bootJar
-    from(zipTree(tasks.bootJar.outputs.files.singleFile))
-    into("build/dependency")
+bootJar {
+	archiveName = "teveo_platform.jar"
 }
 
+
 docker {
+	dependsOn build
     name "sergiosanchez11/${bootJar.baseName}:${bootJar.version}"
     tag 'myRegistry', "sergiosanchez11/${bootJar.baseName}:${bootJar.version}"
-    copySpec.from(tasks.unpack.outputs).into("dependency")
-    dockerfile file('src/main/docker/Dockerfile')
-    buildArgs([BUILD_VERSION: 'version'])
-    labels(['key': 'value'])
+    dockerfile file('Dockerfile')
+    files bootJar.archivePath
+    buildArgs(['JAR_FILE': "${bootJar.archiveName}"])
     pull true
     noCache true
+}
+
+
+dockerCompose {
+	dockerComposeFile 'docker-compose.yml'
 }

@@ -1,0 +1,51 @@
+version: '3.1'
+
+services:
+
+  teveo_platform:
+    image: sergiosanchez11/teveo_platform:0.0.1-SNAPSHOT
+    container_name: teveoplatform
+    hostname: teveoplatform
+    env_file:
+      - .env
+    environment: 
+      - SPRING_DATA_MONGODB_DATABASE=${MONGO_DB}
+      - SPRING_DATA_MONGODB_HOST=mongo
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_USERNAME=${MONGO_ROOT_USER}
+      - SPRING_DATA_MONGODB_PASSWORD=${MONGO_ROOT_PASSWORD}
+    ports:
+      - "8088:8088"
+    links:
+      - mongo
+
+  mongo:
+    image: mongo
+    container_name: mongo
+    env_file:
+      - .env
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_DB}
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    env_file:
+      - .env
+    restart: always
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_ROOT_USER}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_ROOT_PASSWORD}
+      - ME_CONFIG_BASICAUTH_USERNAME=${MONGOEXPRESS_LOGIN}
+      - ME_CONFIG_BASICAUTH_PASSWORD=${MONGOEXPRESS_PASSWORD}
+    depends_on:
+      - mongo
+    ports:
+      - "8080:8081"
