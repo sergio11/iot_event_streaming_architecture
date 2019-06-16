@@ -20,7 +20,7 @@ services:
       - SPRING_DATA_MONGODB_PASSWORD=${MONGO_ROOT_PASSWORD}
       - SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=admin
     ports:
-      - "8088:8088"
+      - "8088:8080"
     links:
       - mongo
 
@@ -92,5 +92,46 @@ services:
     restart: unless-stopped
     ports:
       - '9090:9090'
+    depends_on:
+      - cadvisor
+      - nodeexporter
+      
+      
+  nodeexporter:
+    image: prom/node-exporter:v0.18.1
+    container_name: nodeexporter
+    hostname: nodeexporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - c:\:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+    restart: unless-stopped
+    ports:
+      - '9100:9100'
+      
+  cadvisor:
+    image: google/cadvisor:v0.33.0
+    container_name: cadvisor
+    hostname: cadvisor
+    volumes:
+      - c:\:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    restart: unless-stopped
+    ports:
+      - '8082:8080'
+      
+  pushgateway:
+    image: prom/pushgateway:v0.8.0
+    container_name: pushgateway
+    restart: unless-stopped
+    ports:
+      - '9091:9091'
       
       
