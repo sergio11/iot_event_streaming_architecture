@@ -1,5 +1,9 @@
 version: '3.1'
 
+volumes:
+    prometheus_data: {}
+    grafana_data: {}
+
 services:
 
   teveo_platform:
@@ -50,3 +54,43 @@ services:
       - mongo
     ports:
       - "8080:8081"
+      
+      
+  grafana:
+    image: grafana/grafana:4.4.2
+    container_name: grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/datasources:/etc/grafana/datasources
+      - ./grafana/dashboards:/etc/grafana/dashboards
+      - ./grafana/setup.sh:/setup.sh
+    entrypoint: /setup.sh
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-worldmap-panel,grafana-piechart-panel
+      - GF_USERS_ALLOW_SIGN_UP=false
+    restart: unless-stopped
+    links:
+       - prometheus
+    ports:
+      - '3000:3000'
+      
+  prometheus:
+    image: prom/prometheus:v2.9.2
+    container_name: prometheus
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    ports:
+      - '9090:9090'
+      
+      
