@@ -12,23 +12,255 @@ volumes:
 
 services:
 
-  teveo_platform:
-    image: sergiosanchez11/teveo_platform:0.0.1-SNAPSHOT
-    container_name: teveoplatform
-    hostname: teveoplatform
-    env_file:
-      - .env
-    environment: 
-      - SPRING_DATA_MONGODB_DATABASE=${MONGO_DB}
-      - SPRING_DATA_MONGODB_HOST=mongo
-      - SPRING_DATA_MONGODB_PORT=27017
-      - SPRING_DATA_MONGODB_USERNAME=${MONGO_ROOT_USER}
-      - SPRING_DATA_MONGODB_PASSWORD=${MONGO_ROOT_PASSWORD}
-      - SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=admin
-    ports:
-      - "8081:8080"
+  
+  # ZooKeeper is a centralized service for maintaining configuration information,
+  # naming, providing distributed synchronization, and providing group services.
+  # It provides distributed coordination for our Kafka cluster.
+  # http://zookeeper.apache.org/
+  zookeeper:
+    image: confluentinc/cp-zookeeper
+    container_name: zookeeper
+    # ZooKeeper is designed to "fail-fast", so it is important to allow it to
+    # restart automatically.
+    restart: unless-stopped
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-log:/var/lib/zookeeper/log
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+
+  # Kafka is a distributed streaming platform. It is used to build real-time streaming
+  # data pipelines that reliably move data between systems and platforms, and to build
+  # real-time streaming applications that transform or react to the streams of data.
+  # http://kafka.apache.org/
+  kafka:
+    image: confluentinc/cp-kafka
+    container_name: kafka
+    volumes:
+      - kafka-data:/var/lib/kafka
+    environment:
+      # Required. Instructs Kafka how to get in touch with ZooKeeper.
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_NUM_PARTITIONS: 1
+      KAFKA_COMPRESSION_TYPE: gzip
+      # Required when running in a single-node cluster, as we are. We would be able to take the default if we had
+      # three or more nodes in the cluster.
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      # Required. Kafka will publish this address to ZooKeeper so clients know
+      # how to get in touch with Kafka. "PLAINTEXT" indicates that no authentication
+      # mechanism will be used.
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
     links:
-      - mongo
+      - zookeeper
+
+   # Written and open sourced by Confluent, the Schema Registry for Apache Kafka enables
+  # developers to define standard schemas for their events, share them across the
+  # organization and safely evolve them in a way that is backward compatible and future proof.
+  # https://www.confluent.io/confluent-schema-registry/
+  schema-registry:
+    image: confluentinc/cp-schema-registry:latest
+    container_name: schema-registry
+    restart: unless-stopped
+    environment:
+      # Required. Schema Registry will contact ZooKeeper to figure out how to connect
+      # to the Kafka cluster.
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
+      # Required. This is the hostname that Schema Registry will advertise in ZooKeeper.
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+    # Schema Registry relies upon both Kafka and ZooKeeper. This will instruct docker to wait
+    # until the zookeeper and kafka services are up before attempting to start Schema Registry.
+    depends_on:
+      - zookeeper
+      - kafka
+
+  # A web tool that allows you to create / view / search / evolve / view
+  # history & configure Avro schemas of your Kafka cluster.
+  # https://github.com/Landoop/schema-registry-ui
+  schema-registry-ui:
+    image: landoop/schema-registry-ui:latest
+    container_name: schema-registry-ui
+    # schema-registry-ui binds to port 8000, but we are going to expose it on our local
+    # machine on port 8001.
+    ports:
+      - "8080:8000"
+    environment:
+      # Required. Instructs the UI where it can find the schema registry.
+      SCHEMAREGISTRY_URL: http://schema-registry:8081/
+      # This instructs the docker image to use Caddy to proxy traffic to schema-registry-ui.
+      PROXY: "true"
+    # As this is a UI for Schema Registry, we rely upon Schema Registry. Docker will wait for
+    # the schema-registry service to be up before staring schema-registry-ui.
+    depends_on:
+      - schema-registry
+
+
+  # The Kafka REST Proxy provides a RESTful interface to a Kafka cluster.
+  # It makes it easy to produce and consume messages, view the state
+  # of the cluster, and perform administrative actions without using
+  # the native Kafka protocol or clients.
+  # https://github.com/confluentinc/kafka-rest
+  kafka-rest-proxy:
+    image: confluentinc/cp-kafka-rest:latest
+    container_name: kafka-rest-proxy
+    environment:
+      # Specifies the ZooKeeper connection string. This service connects
+      # to ZooKeeper so that it can broadcast its endpoints as well as
+      # react to the dynamic topology of the Kafka cluster.
+      KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper:2181
+      # The address on which Kafka REST will listen for API requests.
+      KAFKA_REST_LISTENERS: http://0.0.0.0:8082/
+      # The base URL for Schema Registry that should be used by the Avro serializer.
+      KAFKA_REST_SCHEMA_REGISTRY_URL: http://schema-registry:8081/
+      # Required. This is the hostname used to generate absolute URLs in responses.
+      # It defaults to the Java canonical hostname for the container, which might
+      # not be resolvable in a Docker environment.
+      KAFKA_REST_HOST_NAME: kafka-rest-proxy
+      # The list of Kafka brokers to connect to. This is only used for bootstrapping,
+      # the addresses provided here are used to initially connect to the cluster,
+      # after which the cluster will dynamically change. Thanks, ZooKeeper!
+      KAFKA_REST_BOOTSTRAP_SERVERS: kafka:9092
+    # Kafka REST relies upon Kafka, ZooKeeper, and Schema Registry.
+    # This will instruct docker to wait until those services are up
+    # before attempting to start Kafka REST.
+    depends_on:
+      - zookeeper
+      - kafka
+      - schema-registry
+
+  # Browse Kafka topics and understand what's happening on your cluster.
+  # Find topics / view topic metadata / browse topic data
+  # (kafka messages) / view topic configuration / download data.
+  # https://github.com/Landoop/kafka-topics-ui
+  kafka-topics-ui:
+    image: landoop/kafka-topics-ui:latest
+    container_name: kafka-topics-ui
+    ports:
+      - "8081:8000"
+    environment:
+      # Required. Instructs the UI where it can find the Kafka REST Proxy.
+      KAFKA_REST_PROXY_URL: "http://kafka-rest-proxy:8082/"
+      # This instructs the docker image to use Caddy to proxy traffic to kafka-topics-ui.
+      PROXY: "true"
+    # kafka-topics-ui relies upon Kafka REST.
+    # This will instruct docker to wait until those services are up
+    # before attempting to start kafka-topics-ui.
+    depends_on:
+      - kafka-rest-proxy
+
+  # Kafka Connect, an open source component of Apache Kafka,
+  # is a framework for connecting Kafka with external systems
+  # such as databases, key-value stores, search indexes, and file systems.
+  # https://docs.confluent.io/current/connect/index.html
+  kafka-connect:
+    image: confluentinc/cp-kafka-connect:latest
+    hostname: kafka-connect
+    container_name: kafka-connect
+    environment:
+      # Required.
+      # The list of Kafka brokers to connect to. This is only used for bootstrapping,
+      # the addresses provided here are used to initially connect to the cluster,
+      # after which the cluster can dynamically change. Thanks, ZooKeeper!
+      CONNECT_BOOTSTRAP_SERVERS: "kafka:9092"
+      # Required. A unique string that identifies the Connect cluster group this worker belongs to.
+      CONNECT_GROUP_ID: kafka-connect-group
+      # Connect will actually use Kafka topics as a datastore for configuration and other data. #meta
+      # Required. The name of the topic where connector and task configuration data are stored.
+      CONNECT_CONFIG_STORAGE_TOPIC: kafka-connect-meta-configs
+      # Required. The name of the topic where connector and task configuration offsets are stored.
+      CONNECT_OFFSET_STORAGE_TOPIC: kafka-connect-meta-offsets
+      # Required. The name of the topic where connector and task configuration status updates are stored.
+      CONNECT_STATUS_STORAGE_TOPIC: kafka-connect-meta-status
+      # Required. Converter class for key Connect data. This controls the format of the
+      # data that will be written to Kafka for source connectors or read from Kafka for sink connectors.
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      # Allows connect to leverage the power of schema registry. Here we define it for key schemas.
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
+      # Required. Converter class for value Connect data. This controls the format of the
+      # data that will be written to Kafka for source connectors or read from Kafka for sink connectors.
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      # Allows connect to leverage the power of schema registry. Here we define it for value schemas.
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
+      # Required. Converter class for internal key Connect data that implements the Converter interface.
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      # Required. Converter class for offset value Connect data that implements the Converter interface.
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      # Required. The hostname that will be given out to other workers to connect to.
+      CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
+      # The next three are required when running in a single-node cluster, as we are.
+      # We would be able to take the default (of 3) if we had three or more nodes in the cluster.
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
+      #Connectos path
+      CONNECT_PLUGIN_PATH: "/usr/share/java,/data/connectors/"
+    volumes:
+      - ./kafka_connect/data:/data
+    # kafka-connect relies upon Kafka and ZooKeeper.
+    # This will instruct docker to wait until those services are up
+    # before attempting to start kafka-connect.
+    depends_on:
+      - zookeeper
+      - kafka
+
+  # This is a web tool for Kafka Connect for setting up and managing connectors for multiple connect clusters.
+  # https://github.com/Landoop/kafka-connect-ui
+  kafka-connect-ui:
+    image: landoop/kafka-connect-ui:latest
+    container_name: kafka-connect-ui
+    # kafka-connect-ui binds to port 8000, but we are going to expose it on our local
+    # machine on port 8002.
+    ports:
+      - "8082:8000"
+    environment:
+      # Required. Instructs the UI where it can find Kafka Connect.
+      CONNECT_URL: "http://kafka-connect:8083/"
+      # This instructs the docker image to use Caddy to proxy traffic to kafka-connect-ui.
+      PROXY: "true"
+    # kafka-connect-ui relies upon Kafka Connect.
+    # This will instruct docker to wait until those services are up
+    # before attempting to start kafka-connect-ui.
+    depends_on:
+      - kafka-connect
+
+  # API for ZooNavigator, web-based browser & editor for ZooKeeper.
+  # https://github.com/elkozmon/zoonavigator-api
+  zoonavigator-api:
+    image: elkozmon/zoonavigator-api:latest
+    container_name: zoonavigator-api
+    environment:
+      # The port on which the api service will listen for incoming connections.
+      SERVER_HTTP_PORT: 9000
+    restart: unless-stopped
+    # zoonavigator-api relies upon ZooKeeper.
+    # This will instruct docker to wait until those services are up
+    # before attempting to start zoonavigator-api.
+    depends_on:
+      - zookeeper
+
+  # Web client for ZooNavigator, web-based browser & editor for ZooKeeper.
+  # https://github.com/elkozmon/zoonavigator-web
+  zoonavigator-web:
+    image: elkozmon/zoonavigator-web:latest
+    container_name: zoonavigator-web
+    # zoonavigator-web binds to port 8000, but we are going to expose it on our local
+    # machine on port 8002.
+    ports:
+      - "8083:8000"
+    environment:
+      # The following two keys instruct the web component how to connect to
+      # the backing api component.
+      API_HOST: "zoonavigator-api"
+      API_PORT: 9000
+    # zoonavigator-web relies upon zoonavigator-api.
+    # This will instruct docker to wait until those services are up
+    # before attempting to start zoonavigator-web.
+    depends_on:
+      - zoonavigator-api
+    restart: unless-stopped
 
   mongo:
     image: mongo
@@ -59,48 +291,7 @@ services:
     depends_on:
       - mongo
     ports:
-      - "8080:8081"
-
-  akhq:
-    image: tchiotludo/akhq
-    container_name: akhq
-    environment:
-      AKHQ_CONFIGURATION: |
-        akhq:
-          connections:
-            docker-kafka-server:
-              properties:
-                bootstrap.servers: "kafka:9092"
-    ports:
-      - 8082:8080
-    links:
-      - kafka
-      
-  zookeeper:
-    image: confluentinc/cp-zookeeper
-    container_name: zookeeper
-    volumes:
-      - zookeeper-data:/var/lib/zookeeper/data
-      - zookeeper-log:/var/lib/zookeeper/log
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-
-  kafka:
-    image: confluentinc/cp-kafka
-    container_name: kafka
-    volumes:
-      - kafka-data:/var/lib/kafka
-    environment:
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_NUM_PARTITIONS: 12
-      KAFKA_COMPRESSION_TYPE: gzip
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
-    links:
-      - zookeeper
+      - "8084:8081"
       
       
   grafana:
@@ -121,7 +312,7 @@ services:
     links:
        - prometheus
     ports:
-      - '3000:3000'
+      - '8085:3000'
       
   prometheus:
     image: prom/prometheus:latest
@@ -138,7 +329,7 @@ services:
       - '--web.enable-lifecycle'
     restart: unless-stopped
     ports:
-      - '9090:9090'
+      - '8086:9090'
     depends_on:
       - cadvisor
       - nodeexporter
@@ -173,7 +364,7 @@ services:
       - /dev/disk/:/dev/disk:ro
     restart: unless-stopped
     ports:
-      - '8083:8080'
+      - '8087:8080'
 
   kafka-exporter:
     image: bitnami/kafka-exporter:latest
