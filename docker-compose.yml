@@ -190,6 +190,7 @@ services:
       CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       # Required. The hostname that will be given out to other workers to connect to.
       CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
+      CONNECT_REST_PORT: 8083
       # The next three are required when running in a single-node cluster, as we are.
       # We would be able to take the default (of 3) if we had three or more nodes in the cluster.
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
@@ -197,8 +198,26 @@ services:
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
       #Connectos path
       CONNECT_PLUGIN_PATH: "/usr/share/java,/data/connectors/"
+      CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
+      CONNECT_LOG4J_LOGGERS: "org.apache.kafka.connect.runtime.rest=WARN,org.reflections=ERROR"
     volumes:
       - ./kafka_connect/data:/data
+    command: 
+      - bash 
+      - -c 
+      - |
+        echo "Launching Kafka Connect worker"
+        /etc/confluent/docker/run & 
+        #
+        echo "Waiting for Kafka Connect to start listening on http://$$CONNECT_REST_ADVERTISED_HOST_NAME:$$CONNECT_REST_PORT/connectors ⏳"
+        while [ $$(curl -s -o /dev/null -w %{http_code} http://$$CONNECT_REST_ADVERTISED_HOST_NAME:$$CONNECT_REST_PORT/connectors) -ne 200 ] ; do 
+          echo -e $$(date) " Kafka Connect listener HTTP state: " $$(curl -s -o /dev/null -w %{http_code} http://$$CONNECT_REST_ADVERTISED_HOST_NAME:$$CONNECT_REST_PORT/connectors) " (waiting for 200)"
+          sleep 5 
+        done
+        nc -vz $$CONNECT_REST_ADVERTISED_HOST_NAME $$CONNECT_REST_PORT
+        echo -e "\n--\n+> Creating Kafka Connect MongoDB sink Current PATH ($$PWD)"
+        /data/scripts/create_mongo_sink.sh 
+        sleep infinity
     # kafka-connect relies upon Kafka and ZooKeeper.
     # This will instruct docker to wait until those services are up
     # before attempting to start kafka-connect.
