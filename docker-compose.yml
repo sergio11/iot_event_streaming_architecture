@@ -126,6 +126,8 @@ services:
     # Kafka REST relies upon Kafka, ZooKeeper, and Schema Registry.
     # This will instruct docker to wait until those services are up
     # before attempting to start Kafka REST.
+    ports:
+      - "9999:8082"
     depends_on:
       - zookeeper
       - kafka
