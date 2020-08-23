@@ -57,7 +57,7 @@ services:
     links:
       - zookeeper
 
-   # Written and open sourced by Confluent, the Schema Registry for Apache Kafka enables
+  # Written and open sourced by Confluent, the Schema Registry for Apache Kafka enables
   # developers to define standard schemas for their events, share them across the
   # organization and safely evolve them in a way that is backward compatible and future proof.
   # https://www.confluent.io/confluent-schema-registry/
@@ -217,6 +217,8 @@ services:
         nc -vz $$CONNECT_REST_ADVERTISED_HOST_NAME $$CONNECT_REST_PORT
         echo -e "\n--\n+> Creating Kafka Connect MongoDB sink Current PATH ($$PWD)"
         /data/scripts/create_mongo_sink.sh 
+        echo -e "\n--\n+> Creating MQTT Source Connect Current PATH ($$PWD)"
+        /data/scripts/create_mqtt_source.sh
         sleep infinity
     # kafka-connect relies upon Kafka and ZooKeeper.
     # This will instruct docker to wait until those services are up
@@ -280,6 +282,15 @@ services:
     depends_on:
       - zoonavigator-api
     restart: unless-stopped
+
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    hostname: mosquitto
+    container_name: mosquitto
+    expose:
+      - "1883"
+    ports:
+      - "1883:1883"
 
   mongo:
     image: mongo
