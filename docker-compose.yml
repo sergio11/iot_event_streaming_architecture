@@ -217,6 +217,8 @@ services:
           sleep 5 
         done
         nc -vz $$CONNECT_REST_ADVERTISED_HOST_NAME $$CONNECT_REST_PORT
+        echo -e "\n--\n+> Creating IoT Frames Topic"
+        /data/scripts/create_iot_frames_topic.sh 
         echo -e "\n--\n+> Creating Kafka Connect MongoDB sink Current PATH ($$PWD)"
         /data/scripts/create_mongo_sink.sh 
         echo -e "\n--\n+> Creating MQTT Source Connect Current PATH ($$PWD)"
@@ -285,6 +287,9 @@ services:
       - zoonavigator-api
     restart: unless-stopped
 
+  # Eclipse Mosquitto is an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1. Mosquitto is lightweight and is suitable for use on all devices from low power single board computers to full servers.
+  # The MQTT protocol provides a lightweight method of carrying out messaging using a publish/subscribe model. This makes it suitable for Internet of Things messaging such as with low power sensors or mobile devices such as phones, embedded computers or microcontrollers.
+  # The Mosquitto project also provides a C library for implementing MQTT clients, and the very popular mosquitto_pub and mosquitto_sub command line MQTT clients.
   mosquitto:
     image: eclipse-mosquitto:latest
     hostname: mosquitto
@@ -305,6 +310,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
       - MONGO_INITDB_DATABASE=${MONGO_DB}
 
+  # Web-based MongoDB admin interface, written with Node.js and express
   mongo-express:
     image: mongo-express
     container_name: mongo-express
@@ -325,7 +331,10 @@ services:
     ports:
       - "8084:8081"
       
-      
+  
+  # Grafana is a multi-platform open source analytics and interactive visualization web application. 
+  # It provides charts, graphs, and alerts for the web when connected to supported data sources. 
+  # It is expandable through a plug-in system. End users can create complex monitoring dashboards using interactive query builders.
   grafana:
     image: grafana/grafana:latest-ubuntu
     container_name: grafana
@@ -345,7 +354,11 @@ services:
        - prometheus
     ports:
       - '8085:3000'
-      
+  
+  # Prometheus is a free software application used for event monitoring and alerting.
+  # It records real-time metrics in a time series database built using a HTTP pull model, with flexible queries and real-time alerting.
+  # The project is written in Go and licensed under the Apache 2 License, with source code available on GitHub,
+  # and is a graduated project of the Cloud Native Computing Foundation, along with Kubernetes and Envoy.
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -366,7 +379,7 @@ services:
       - cadvisor
       - nodeexporter
       
-      
+  # Exporter for machine metrics    
   nodeexporter:
     image: prom/node-exporter:v0.18.1
     container_name: nodeexporter
@@ -384,6 +397,7 @@ services:
     ports:
       - '9100:9100'
       
+  # Analyzes resource usage and performance characteristics of running containers.
   cadvisor:
     image: google/cadvisor:latest
     container_name: cadvisor
@@ -398,6 +412,7 @@ services:
     ports:
       - '8087:8080'
 
+  # Kafka exporter for Prometheus
   kafka-exporter:
     image: bitnami/kafka-exporter:latest
     container_name: kafka-exporter
