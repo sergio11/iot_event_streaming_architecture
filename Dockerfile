@@ -1,6 +1,6 @@
 FROM openjdk:8-jdk-alpine
 # Add Maintainer Info
-LABEL description="Covid Tweets Ingest"
+LABEL description="Simulate IoT Temperature Sensor"
 # Args for image
 ARG PORT=8080
 
@@ -11,7 +11,7 @@ WORKDIR /usr/src/app
 
 
 COPY resources/wait-for-it.sh  wait-for-it.sh
-COPY target/covid_tweets_ingest.jar app.jar
+COPY target/temperature_sensor.jar app.jar
 
 RUN dos2unix wait-for-it.sh
 RUN chmod +x wait-for-it.sh
@@ -21,4 +21,4 @@ RUN ls -al
 
 EXPOSE ${PORT}
 
-CMD ["sh", "-c", "echo 'waiting for 300 seconds for kafka:9092 to be accessable before starting application' && ./wait-for-it.sh -t 300 kafka:9092 -- java -jar app.jar"]
+CMD ["sh", "-c", "echo 'waiting for 300 seconds for mosquitto:1883 to be accessable before starting application' && ./wait-for-it.sh -t 300 mosquitto:1883 -- java -jar app.jar"]

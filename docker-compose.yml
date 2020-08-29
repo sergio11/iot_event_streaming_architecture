@@ -178,12 +178,12 @@ services:
       CONNECT_STATUS_STORAGE_TOPIC: kafka-connect-meta-status
       # Required. Converter class for key Connect data. This controls the format of the
       # data that will be written to Kafka for source connectors or read from Kafka for sink connectors.
-      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
-      # Allows connect to leverage the power of schema registry. Here we define it for key schemas.
-      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       # Required. Converter class for value Connect data. This controls the format of the
       # data that will be written to Kafka for source connectors or read from Kafka for sink connectors.
-      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      # Allows connect to leverage the power of schema registry. Here we define it for key schemas.
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
       # Allows connect to leverage the power of schema registry. Here we define it for value schemas.
       CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
       # Required. Converter class for internal key Connect data that implements the Converter interface.
@@ -423,6 +423,16 @@ services:
       - '--web.telemetry-path=/metrics'
       - '--log.level=debug'
     restart: unless-stopped
+
+ 
+  # Temperature Sensor 1
+  temperature_sensor_1:
+    image: ssanchez11/temperature_sensor:0.0.1-SNAPSHOT
+    container_name: temperature_sensor_1
+    restart: unless-stopped
+    environment:
+      - sensor.name=${TEMPERATURE_SENSOR_1_NAME}
+      - sensor.id=${TEMPERATURE_SENSOR_1_ID}
       
   pushgateway:
     image: prom/pushgateway:v0.8.0
