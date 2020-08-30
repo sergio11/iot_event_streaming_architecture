@@ -80,8 +80,8 @@ public class EngineTemperatureSensor implements Callable<Void> {
         logger.debug("Payload -> " + payload);
 
         // Create and configure MQTT Message
-        final MqttMessage message = new MqttMessage(payload.getBytes(Charset.forName("UTF-32")));
-        message.setQos(0);
+        final MqttMessage message = new MqttMessage(payload.getBytes(Charset.forName("UTF-8")));
+        message.setQos(1);
         message.setRetained(true);
         return message;
     }

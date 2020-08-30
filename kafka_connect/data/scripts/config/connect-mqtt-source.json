@@ -5,9 +5,14 @@
         "tasks.max": 1,
         "mqtt.server.uri": "tcp://mosquitto:1883",
         "mqtt.topics": "iot-frames",
+        "mqtt.qos": 1,
         "kafka.topic": "iot-frames",
         "value.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+        "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "converter.encoding": "UTF-8",
+        "value.converter.schemas.enable": false,
         "confluent.topic.bootstrap.servers": "kafka:9092",
         "confluent.topic.replication.factor": 1
     }
 }
+

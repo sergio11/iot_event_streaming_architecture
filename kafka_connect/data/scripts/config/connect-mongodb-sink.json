@@ -4,12 +4,11 @@
       "connector.class":"com.mongodb.kafka.connect.MongoSinkConnector",
       "tasks.max":1,
       "topics":"iot-frames",
-      "connection.uri":"mongodb://mongo:27017",
+      "connection.uri":"mongodb://devroot:devroot@mongo:27017",
       "database":"iot",
       "collection":"iot_frames",
-      "key.converter":"org.apache.kafka.connect.json.JsonConverter",
-      "key.converter.schemas.enable":false,
-      "value.converter":"org.apache.kafka.connect.json.JsonConverter",
-      "value.converter.schemas.enable":false
+      "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+      "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+      "value.converter.schemas.enable": false
    }
 }

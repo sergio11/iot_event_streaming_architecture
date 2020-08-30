@@ -181,15 +181,9 @@ services:
       CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       # Required. Converter class for value Connect data. This controls the format of the
       # data that will be written to Kafka for source connectors or read from Kafka for sink connectors.
-      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      # Allows connect to leverage the power of schema registry. Here we define it for key schemas.
-      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
       # Allows connect to leverage the power of schema registry. Here we define it for value schemas.
       CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
-      # Required. Converter class for internal key Connect data that implements the Converter interface.
-      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
-      # Required. Converter class for offset value Connect data that implements the Converter interface.
-      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       # Required. The hostname that will be given out to other workers to connect to.
       CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
       CONNECT_REST_PORT: 8083
@@ -201,7 +195,6 @@ services:
       #Connectos path
       CONNECT_PLUGIN_PATH: "/usr/share/java,/data/connectors/"
       CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
-      CONNECT_LOG4J_LOGGERS: "org.apache.kafka.connect.runtime.rest=WARN,org.reflections=ERROR"
     volumes:
       - ./kafka_connect/data:/data
     command: 
