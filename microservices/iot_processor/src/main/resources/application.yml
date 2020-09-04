@@ -1,0 +1,22 @@
+## YAML Template.
+logging:
+    level:
+        com.dreamsoftware.iotframesingest: DEBUG
+
+spring:
+  kafka:
+    client-id: iot-processor
+    bootstrap-servers:
+      - kafka:9092
+    template:
+      default-topic: iot-frames
+    consumer:
+      group-id: iot-processor-consumer
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+---
+kafka:
+  topic:
+    input: iot-frames
+    output: iot-frames-processed

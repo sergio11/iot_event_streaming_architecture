@@ -389,6 +389,12 @@ services:
     environment:
       - sensor.name=${IOT_SENSOR_2_ID}
       - sensor.id=${IOT_SENSOR_2_ID}
+
+  # IoT Processor
+  iot_processor:
+    image: ssanchez11/iot_processor:0.0.1-SNAPSHOT
+    container_name: iot_processor
+    restart: unless-stopped
       
   pushgateway:
     image: prom/pushgateway:v0.8.0
