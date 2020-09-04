@@ -12,7 +12,6 @@ volumes:
 
 services:
 
-  
   # ZooKeeper is a centralized service for maintaining configuration information,
   # naming, providing distributed synchronization, and providing group services.
   # It provides distributed coordination for our Kafka cluster.
@@ -57,46 +56,6 @@ services:
     links:
       - zookeeper
 
-  # Written and open sourced by Confluent, the Schema Registry for Apache Kafka enables
-  # developers to define standard schemas for their events, share them across the
-  # organization and safely evolve them in a way that is backward compatible and future proof.
-  # https://www.confluent.io/confluent-schema-registry/
-  schema-registry:
-    image: confluentinc/cp-schema-registry:latest
-    container_name: schema-registry
-    restart: unless-stopped
-    environment:
-      # Required. Schema Registry will contact ZooKeeper to figure out how to connect
-      # to the Kafka cluster.
-      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
-      # Required. This is the hostname that Schema Registry will advertise in ZooKeeper.
-      SCHEMA_REGISTRY_HOST_NAME: schema-registry
-    # Schema Registry relies upon both Kafka and ZooKeeper. This will instruct docker to wait
-    # until the zookeeper and kafka services are up before attempting to start Schema Registry.
-    depends_on:
-      - zookeeper
-      - kafka
-
-  # A web tool that allows you to create / view / search / evolve / view
-  # history & configure Avro schemas of your Kafka cluster.
-  # https://github.com/Landoop/schema-registry-ui
-  schema-registry-ui:
-    image: landoop/schema-registry-ui:latest
-    container_name: schema-registry-ui
-    # schema-registry-ui binds to port 8000, but we are going to expose it on our local
-    # machine on port 8001.
-    ports:
-      - "8080:8000"
-    environment:
-      # Required. Instructs the UI where it can find the schema registry.
-      SCHEMAREGISTRY_URL: http://schema-registry:8081/
-      # This instructs the docker image to use Caddy to proxy traffic to schema-registry-ui.
-      PROXY: "true"
-    # As this is a UI for Schema Registry, we rely upon Schema Registry. Docker will wait for
-    # the schema-registry service to be up before staring schema-registry-ui.
-    depends_on:
-      - schema-registry
-
 
   # The Kafka REST Proxy provides a RESTful interface to a Kafka cluster.
   # It makes it easy to produce and consume messages, view the state
@@ -113,8 +72,6 @@ services:
       KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper:2181
       # The address on which Kafka REST will listen for API requests.
       KAFKA_REST_LISTENERS: http://0.0.0.0:8082/
-      # The base URL for Schema Registry that should be used by the Avro serializer.
-      KAFKA_REST_SCHEMA_REGISTRY_URL: http://schema-registry:8081/
       # Required. This is the hostname used to generate absolute URLs in responses.
       # It defaults to the Java canonical hostname for the container, which might
       # not be resolvable in a Docker environment.
@@ -123,7 +80,7 @@ services:
       # the addresses provided here are used to initially connect to the cluster,
       # after which the cluster will dynamically change. Thanks, ZooKeeper!
       KAFKA_REST_BOOTSTRAP_SERVERS: kafka:9092
-    # Kafka REST relies upon Kafka, ZooKeeper, and Schema Registry.
+    # Kafka REST relies upon Kafka, ZooKeeper
     # This will instruct docker to wait until those services are up
     # before attempting to start Kafka REST.
     ports:
@@ -131,7 +88,6 @@ services:
     depends_on:
       - zookeeper
       - kafka
-      - schema-registry
 
   # Browse Kafka topics and understand what's happening on your cluster.
   # Find topics / view topic metadata / browse topic data
@@ -181,9 +137,7 @@ services:
       CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       # Required. Converter class for value Connect data. This controls the format of the
       # data that will be written to Kafka for source connectors or read from Kafka for sink connectors.
-      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
-      # Allows connect to leverage the power of schema registry. Here we define it for value schemas.
-      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       # Required. The hostname that will be given out to other workers to connect to.
       CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
       CONNECT_REST_PORT: 8083
@@ -418,14 +372,23 @@ services:
     restart: unless-stopped
 
  
-  # Temperature Sensor 1
-  temperature_sensor_1:
-    image: ssanchez11/temperature_sensor:0.0.1-SNAPSHOT
-    container_name: temperature_sensor_1
+  # IoT Sensor 1
+  iot_sensor_1:
+    image: ssanchez11/iot_sensor:0.0.1-SNAPSHOT
+    container_name: iot_sensor_1
     restart: unless-stopped
     environment:
-      - sensor.name=${TEMPERATURE_SENSOR_1_NAME}
-      - sensor.id=${TEMPERATURE_SENSOR_1_ID}
+      - sensor.name=${IOT_SENSOR_1_NAME}
+      - sensor.id=${IOT_SENSOR_1_ID}
+
+  # IoT Sensor 2
+  iot_sensor_2:
+    image: ssanchez11/iot_sensor:0.0.1-SNAPSHOT
+    container_name: iot_sensor_2
+    restart: unless-stopped
+    environment:
+      - sensor.name=${IOT_SENSOR_2_ID}
+      - sensor.id=${IOT_SENSOR_2_ID}
       
   pushgateway:
     image: prom/pushgateway:v0.8.0

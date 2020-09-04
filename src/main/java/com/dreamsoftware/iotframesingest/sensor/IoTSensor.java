@@ -1,6 +1,7 @@
 package com.dreamsoftware.iotframesingest.sensor;
 
-import com.dreamsoftware.iotframesingest.model.SensorTemperatureDataDTO;
+import com.dreamsoftware.iotframesingest.model.SensorDataDTO;
+import com.dreamsoftware.iotframesingest.model.SensorDataPayloadDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.Charset;
@@ -20,9 +21,9 @@ import org.springframework.stereotype.Component;
  * @author ssanchez
  */
 @Component
-public class EngineTemperatureSensor implements Callable<Void> {
+public class IoTSensor implements Callable<Void> {
 
-    private static final Logger logger = LoggerFactory.getLogger(EngineTemperatureSensor.class);
+    private static final Logger logger = LoggerFactory.getLogger(IoTSensor.class);
 
     private final IMqttClient mqttClient;
     private final ObjectMapper objectMapper;
@@ -42,7 +43,7 @@ public class EngineTemperatureSensor implements Callable<Void> {
      * @param objectMapper
      */
     @Autowired
-    public EngineTemperatureSensor(final IMqttClient mqttClient, final ObjectMapper objectMapper) {
+    public IoTSensor(final IMqttClient mqttClient, final ObjectMapper objectMapper) {
         this.mqttClient = mqttClient;
         this.objectMapper = objectMapper;
     }
@@ -64,15 +65,24 @@ public class EngineTemperatureSensor implements Callable<Void> {
      */
     private MqttMessage buildMessage() throws JsonProcessingException {
 
-        // Generate Random Temperature
-        double temp = 80 + rnd.nextDouble() * 20.0;
+        //Generate Sensor Values
+        int temperature = rnd.ints(-5, 35).findFirst().getAsInt();
+        int humidity = rnd.ints(0, 100).findFirst().getAsInt();
+        int pressure = rnd.ints(1000, 1030).findFirst().getAsInt();
+        int luminosity = rnd.ints(0, 65000).findFirst().getAsInt();
 
         // Generate Payload
-        final SensorTemperatureDataDTO data = SensorTemperatureDataDTO.builder()
+        final SensorDataDTO data = SensorDataDTO.builder()
                 .id(sensorId)
                 .name(sensorName)
-                .temperature(String.format("T:%04.2f", temp))
                 .date(new Date())
+                .timestamp(new Date().getTime())
+                .payload(SensorDataPayloadDTO.builder()
+                        .humidity(humidity)
+                        .luminosity(luminosity)
+                        .pressure(pressure)
+                        .temperature(temperature)
+                        .build())
                 .build();
 
         final String payload = objectMapper.writeValueAsString(data);

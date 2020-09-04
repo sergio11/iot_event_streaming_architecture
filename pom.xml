@@ -11,8 +11,8 @@
     <groupId>com.dreamsoftware</groupId>
     <artifactId>iotframesingest</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>temperature_sensor</name>
-    <description>Simulate IoT Temperature Sensor</description>
+    <name>iot_sensor</name>
+    <description>Simulate IoT Sensor</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -52,7 +52,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <finalName>temperature_sensor</finalName>
+                    <finalName>iot_sensor</finalName>
                 </configuration>
             </plugin>
 
@@ -90,10 +90,10 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <repository>ssanchez11/temperature_sensor</repository>
+                    <repository>ssanchez11/iot_sensor</repository>
                     <tag>${project.version}</tag>
                     <buildArgs>
-                        <JAR_FILE>temperature_sensor</JAR_FILE>
+                        <JAR_FILE>iot_sensor</JAR_FILE>
                     </buildArgs>
                     <useMavenSettingsForAuth>false</useMavenSettingsForAuth>
                     <forceTags>true</forceTags>

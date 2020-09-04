@@ -1,6 +1,6 @@
 package com.dreamsoftware.iotframesingest.tasks;
 
-import com.dreamsoftware.iotframesingest.sensor.EngineTemperatureSensor;
+import com.dreamsoftware.iotframesingest.sensor.IoTSensor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ public class ScheduledTasks {
     private static final Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
 
     @Autowired
-    protected EngineTemperatureSensor temperatureSensor;
+    protected IoTSensor temperatureSensor;
 
     /**
      * Report Current Temperature every scond Task

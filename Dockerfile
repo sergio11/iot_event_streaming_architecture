@@ -1,6 +1,6 @@
 FROM openjdk:8-jdk-alpine
 # Add Maintainer Info
-LABEL description="Simulate IoT Temperature Sensor"
+LABEL description="Simulate IoT Sensor"
 # Args for image
 ARG PORT=8080
 
@@ -11,7 +11,7 @@ WORKDIR /usr/src/app
 
 
 COPY resources/wait-for-it.sh  wait-for-it.sh
-COPY target/temperature_sensor.jar app.jar
+COPY target/iot_sensor.jar app.jar
 
 RUN dos2unix wait-for-it.sh
 RUN chmod +x wait-for-it.sh
