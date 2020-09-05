@@ -378,8 +378,8 @@ services:
     container_name: iot_sensor_1
     restart: unless-stopped
     environment:
-      - sensor.name=${IOT_SENSOR_1_NAME}
       - sensor.id=${IOT_SENSOR_1_ID}
+      - sensor.name=${IOT_SENSOR_1_NAME}
 
   # IoT Sensor 2
   iot_sensor_2:
@@ -387,8 +387,9 @@ services:
     container_name: iot_sensor_2
     restart: unless-stopped
     environment:
-      - sensor.name=${IOT_SENSOR_2_ID}
       - sensor.id=${IOT_SENSOR_2_ID}
+      - sensor.name=${IOT_SENSOR_2_NAME}
+      
 
   # IoT Processor
   iot_processor:

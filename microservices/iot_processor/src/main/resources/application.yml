@@ -10,11 +10,14 @@ spring:
       - kafka:9092
     template:
       default-topic: iot-frames
+    producer:
+      key-serializer: com.dreamsoftware.iotframesingest.serde.SensorKeyDeserializer
+      value-serializer: com.dreamsoftware.iotframesingest.serde.SensorDataSerializer
     consumer:
       group-id: iot-processor-consumer
       auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      key-deserializer: com.dreamsoftware.iotframesingest.serde.SensorKeySerializer
+      value-deserializer: com.dreamsoftware.iotframesingest.serde.SensorDataDeserializer
 ---
 kafka:
   topic:

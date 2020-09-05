@@ -1,10 +1,14 @@
 package com.dreamsoftware.iotframesingest.config;
 
+import com.dreamsoftware.iotframesingest.model.SensorDataDTO;
+import com.dreamsoftware.iotframesingest.model.SensorKeyDTO;
+import com.dreamsoftware.iotframesingest.serde.SensorDataSerde;
+import com.dreamsoftware.iotframesingest.serde.SensorKeySerde;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.errors.LogAndContinueExceptionHandler;
 import org.apache.kafka.streams.kstream.KStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +49,9 @@ public class KafkaStreamsConfig {
         Map<String, Object> config = new HashMap<>();
         config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
         config.put(StreamsConfig.APPLICATION_ID_CONFIG, kafkaProperties.getClientId());
-        config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
-        config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.Long().getClass());
+        config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, SensorKeySerde.class.getName());
+        config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, SensorDataSerde.class.getName());
+        config.put(StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG, LogAndContinueExceptionHandler.class);
         return new KafkaStreamsConfiguration(config);
     }
 
@@ -57,11 +62,10 @@ public class KafkaStreamsConfig {
      * @return
      */
     @Bean
-    public KStream<String, String> provideKStream(StreamsBuilder kStreamBuilder) {
-        KStream<String, String> stream = kStreamBuilder.stream(inputTopic);
+    public KStream<SensorKeyDTO, SensorDataDTO> provideKStream(StreamsBuilder kStreamBuilder) {
+        KStream<SensorKeyDTO, SensorDataDTO> stream = kStreamBuilder.stream(inputTopic);
         stream
                 .mapValues(v -> {
-
                     logger.debug("Processing -> " + v);
                     return v;
                 })

@@ -9,6 +9,7 @@
       "collection":"iot_frames",
       "value.converter": "org.apache.kafka.connect.json.JsonConverter",
       "key.converter": "org.apache.kafka.connect.json.JsonConverter",
-      "value.converter.schemas.enable": false
+      "value.converter.schemas.enable": false,
+      "key.converter.schemas.enable":false
    }
 }
