@@ -4,15 +4,20 @@ import com.dreamsoftware.iotframesingest.model.SensorAggregateMetricsDTO;
 import com.dreamsoftware.iotframesingest.model.SensorDataDTO;
 import com.dreamsoftware.iotframesingest.model.SensorKeyDTO;
 import com.dreamsoftware.iotframesingest.serde.SensorAggregateMetricsSerde;
-import com.dreamsoftware.iotframesingest.serde.SensorKeySerde;
+import com.dreamsoftware.iotframesingest.serde.SensorDataSerde;
 import java.time.Duration;
+import static org.apache.kafka.common.serialization.Serdes.String;
+import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.KeyValue;
+import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
-import org.apache.kafka.streams.kstream.KeyValueMapper;
 import org.apache.kafka.streams.kstream.Materialized;
+import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.TimeWindows;
 import org.apache.kafka.streams.kstream.Windowed;
+import org.apache.kafka.streams.state.Stores;
+import org.apache.kafka.streams.state.WindowStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +33,8 @@ public class AggregateMetricsProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(AggregateMetricsProcessor.class);
 
-    private final static int WINDOW_TIME_IN_MINUTES = 5;
+    private final static int WINDOW_SIZE_IN_MINUTES = 1;
+    private final static int RETENTION_IN_HOURS = 6;
 
     @Value("${kafka.topic.aggregate-metrics}")
     private String outputTopic;
@@ -39,21 +45,15 @@ public class AggregateMetricsProcessor {
      */
     public void process(KStream<SensorKeyDTO, SensorDataDTO> stream) {
 
-        final KTable<Windowed<SensorKeyDTO>, SensorAggregateMetricsDTO> aggregateMetricsBySensor = buildAggregateMetricsBySensor(stream);
+        buildAggregateMetricsBySensor(stream)
+                .toStream()
+                .map((key, value) -> KeyValue.pair(key.key(), value))
+                .foreach((key, value) -> {
+                    logger.debug("Final Process Key -> " + key);
+                    logger.debug("Final Process Count Measures -> " + value.getCountMeasures());
+                });
+        //.to(outputTopic, Produced.with(String(), new SensorAggregateMetricsSerde()));
 
-        aggregateMetricsBySensor.toStream(new KeyValueMapper<Windowed<SensorKeyDTO>, SensorAggregateMetricsDTO, KeyValue<SensorKeyDTO, SensorAggregateMetricsDTO>>() {
-            @Override
-            public KeyValue<SensorKeyDTO, SensorAggregateMetricsDTO> apply(Windowed<SensorKeyDTO> k, SensorAggregateMetricsDTO v) {
-                logger.debug("Sensor Name -> " + v.getName() + " Sensor Count Measures -> " + v.getCountMeasures());
-                logger.debug("Sensor Avg Temperature -> " + v.getSumTemperature());
-                logger.debug("Sensor Avg Humidity -> " + v.getAvgHumidity());
-                logger.debug("Sensor Avg Luminosity -> " + v.getAvgLuminosity());
-                logger.debug("Sensor Avg Pressure -> " + v.getAvgPressure());
-
-                return new KeyValue<>(k.key(), v);
-            }
-
-        });
     }
 
     /**
@@ -61,41 +61,66 @@ public class AggregateMetricsProcessor {
      * @param stream
      * @return
      */
-    private KTable<Windowed<SensorKeyDTO>, SensorAggregateMetricsDTO> buildAggregateMetricsBySensor(KStream<SensorKeyDTO, SensorDataDTO> stream) {
+    private KTable<Windowed<String>, SensorAggregateMetricsDTO> buildAggregateMetricsBySensor(KStream<SensorKeyDTO, SensorDataDTO> stream) {
         return stream
-                .groupByKey()
-                .windowedBy(TimeWindows.of(Duration.ofMinutes(WINDOW_TIME_IN_MINUTES)))
-                .aggregate(() -> new SensorAggregateMetricsDTO(), // initializer
-                        (key, value, aggregate) -> {
+                .map((key, val) -> new KeyValue<>(val.getId(), val))
+                .groupByKey(Grouped.with(String(), new SensorDataSerde()))
+                .windowedBy(TimeWindows.of(Duration.ofMinutes(WINDOW_SIZE_IN_MINUTES)))
+                .aggregate(() -> new SensorAggregateMetricsDTO(),
+                        (String k, SensorDataDTO v, SensorAggregateMetricsDTO va) -> aggregateData(v, va),
+                        buildWindowPersistentStore());
+    }
 
-                            final SensorAggregateMetricsDTO aggregateMetricsDTO = new SensorAggregateMetricsDTO();
+    /**
+     * Build Window Persistent Store
+     *
+     * @return
+     */
+    private Materialized<String, SensorAggregateMetricsDTO, WindowStore<Bytes, byte[]>> buildWindowPersistentStore() {
+        return Materialized.<String, SensorAggregateMetricsDTO>as(
+                Stores.persistentWindowStore("aggregate-metrics-by-sensor",
+                        Duration.ofHours(RETENTION_IN_HOURS),
+                        Duration.ofMinutes(WINDOW_SIZE_IN_MINUTES),
+                        false))
+                .withKeySerde(String())
+                .withValueSerde(new SensorAggregateMetricsSerde());
+    }
 
-                            logger.debug("Aggregate Called for Sensor name -> " + value.getName());
-                            logger.debug("Aggregate Count Measures-> " + aggregate.getCountMeasures());
-                            logger.debug("Aggregate Avg Temperature -> " + aggregate.getAvgTemperature());
-                            logger.debug("Aggregate Avg Humidity -> " + aggregate.getAvgHumidity());
-                            logger.debug("Aggregate Avg Luminosity -> " + aggregate.getAvgLuminosity());
-                            logger.debug("Aggregate Avg Pressure -> " + aggregate.getAvgPressure());
+    /**
+     * Aggregate Data
+     *
+     * @param v
+     * @param va
+     * @return
+     */
+    private SensorAggregateMetricsDTO aggregateData(final SensorDataDTO v, final SensorAggregateMetricsDTO va) {
+        logger.debug("Aggregate Called for Sensor name -> " + v.getName());
+        logger.debug("Aggregate Count Measures-> " + va.getCountMeasures());
+        logger.debug("Aggregate Avg Temperature -> " + va.getAvgTemperature());
+        logger.debug("Aggregate Avg Humidity -> " + va.getAvgHumidity());
+        logger.debug("Aggregate Avg Luminosity -> " + va.getAvgLuminosity());
+        logger.debug("Aggregate Avg Pressure -> " + va.getAvgPressure());
 
-                            aggregateMetricsDTO.setId(value.getId());
-                            aggregateMetricsDTO.setName(value.getName());
-                            aggregateMetricsDTO.setCountMeasures(aggregate.getCountMeasures() + 1);
-                            // Temperature
-                            aggregateMetricsDTO.setSumTemperature(aggregate.getSumTemperature() + value.getPayload().getTemperature());
-                            aggregateMetricsDTO.setAvgTemperature(aggregateMetricsDTO.getSumTemperature() / aggregateMetricsDTO.getCountMeasures());
-                            // Humidity
-                            aggregateMetricsDTO.setSumHumidity(aggregate.getSumHumidity() + value.getPayload().getHumidity());
-                            aggregateMetricsDTO.setAvgHumidity(aggregateMetricsDTO.getSumHumidity() / aggregateMetricsDTO.getCountMeasures());
-                            // Luminosity
-                            aggregateMetricsDTO.setSumLuminosity(aggregate.getSumLuminosity() + value.getPayload().getLuminosity());
-                            aggregateMetricsDTO.setAvgLuminosity(aggregateMetricsDTO.getSumLuminosity() / aggregateMetricsDTO.getCountMeasures());
-                            // Pressure
-                            aggregateMetricsDTO.setSumPressure(aggregate.getSumPressure() + value.getPayload().getPressure());
-                            aggregateMetricsDTO.setAvgPressure(aggregateMetricsDTO.getSumPressure() / aggregateMetricsDTO.getCountMeasures());
-                            return aggregateMetricsDTO;
-                        },
-                        Materialized
-                                .with(new SensorKeySerde(), new SensorAggregateMetricsSerde()));
+        va.setId(va.getId());
+        va.setName(va.getName());
+        va.setCountMeasures(va.getCountMeasures() + 1);
+
+        // Temperature
+        va.setSumTemperature(va.getSumTemperature() + v.getPayload().getTemperature());
+        va.setAvgTemperature(va.getSumTemperature() / va.getCountMeasures()); // Humidity
+
+        // Humidity
+        va.setSumHumidity(va.getSumHumidity() + v.getPayload().getHumidity());
+        va.setAvgHumidity(va.getSumHumidity() / va.getCountMeasures()); // Luminosity
+
+        // Luminosity
+        va.setSumLuminosity(va.getSumLuminosity() + v.getPayload().getLuminosity());
+        va.setAvgLuminosity(va.getSumLuminosity() / va.getCountMeasures()); // Pressure
+
+        // Pressure
+        va.setSumPressure(va.getSumPressure() + v.getPayload().getPressure());
+        va.setAvgPressure(va.getSumPressure() / va.getCountMeasures());
+        return va;
     }
 
 }
