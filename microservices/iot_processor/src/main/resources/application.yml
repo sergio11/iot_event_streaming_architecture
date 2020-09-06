@@ -1,7 +1,7 @@
 ## YAML Template.
 logging:
     level:
-        com.dreamsoftware.iotframesingest: DEBUG
+        com.dreamsoftware.iotframesingest: TRACE
 
 spring:
   kafka:
@@ -11,8 +11,8 @@ spring:
     template:
       default-topic: iot-frames
     producer:
-      key-serializer: com.dreamsoftware.iotframesingest.serde.SensorKeyDeserializer
-      value-serializer: com.dreamsoftware.iotframesingest.serde.SensorDataSerializer
+      key-serializer: com.dreamsoftware.iotframesingest.serde.SensorKeySerializer
+      value-serializer: com.dreamsoftware.iotframesingest.serde.SensorAggregateMetricsSerializer
     consumer:
       group-id: iot-processor-consumer
       auto-offset-reset: earliest
@@ -22,4 +22,4 @@ spring:
 kafka:
   topic:
     input: iot-frames
-    output: iot-frames-processed
+    aggregate-metrics: iot-aggregate-metrics

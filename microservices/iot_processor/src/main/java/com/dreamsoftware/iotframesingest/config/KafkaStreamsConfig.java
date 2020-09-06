@@ -2,6 +2,7 @@ package com.dreamsoftware.iotframesingest.config;
 
 import com.dreamsoftware.iotframesingest.model.SensorDataDTO;
 import com.dreamsoftware.iotframesingest.model.SensorKeyDTO;
+import com.dreamsoftware.iotframesingest.processor.AggregateMetricsProcessor;
 import com.dreamsoftware.iotframesingest.serde.SensorDataSerde;
 import com.dreamsoftware.iotframesingest.serde.SensorKeySerde;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import org.apache.kafka.streams.errors.LogAndContinueExceptionHandler;
 import org.apache.kafka.streams.kstream.KStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
@@ -35,8 +37,8 @@ public class KafkaStreamsConfig {
     @Value("${kafka.topic.input}")
     private String inputTopic;
 
-    @Value("${kafka.topic.output}")
-    private String outputTopic;
+    @Autowired
+    private AggregateMetricsProcessor aggregateMetricsProcessor;
 
     /**
      * Provide KStreams Configs
@@ -63,13 +65,10 @@ public class KafkaStreamsConfig {
      */
     @Bean
     public KStream<SensorKeyDTO, SensorDataDTO> provideKStream(StreamsBuilder kStreamBuilder) {
-        KStream<SensorKeyDTO, SensorDataDTO> stream = kStreamBuilder.stream(inputTopic);
-        stream
-                .mapValues(v -> {
-                    logger.debug("Processing -> " + v);
-                    return v;
-                })
-                .to(outputTopic);
+        final KStream<SensorKeyDTO, SensorDataDTO> stream = kStreamBuilder.stream(inputTopic);
+
+        logger.debug("Start Aggregate Metrics Processor Stream");
+        aggregateMetricsProcessor.process(stream);
         return stream;
     }
 

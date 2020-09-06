@@ -12,12 +12,8 @@ import org.slf4j.LoggerFactory;
  */
 public class SensorDataSerializer implements Serializer<SensorDataDTO> {
 
-    private static final Logger logger = LoggerFactory.getLogger(SensorDataSerializer.class);
-
     @Override
     public byte[] serialize(String string, SensorDataDTO sensorData) {
-
-        logger.debug("Serialize Data -> " + string);
 
         byte[] retVal = null;
         ObjectMapper objectMapper = new ObjectMapper();
