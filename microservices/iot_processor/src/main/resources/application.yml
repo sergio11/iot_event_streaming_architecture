@@ -22,4 +22,4 @@ spring:
 kafka:
   topic:
     input: iot-frames
-    aggregate-metrics: iot-aggregate-metrics
+    aggregate-metrics-sensor: iot-aggregate-metrics-sensor

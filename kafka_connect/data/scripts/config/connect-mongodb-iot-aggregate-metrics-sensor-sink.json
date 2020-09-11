@@ -1,12 +1,12 @@
 {
-   "name":"iot-aggregate-metrics-mongodb-sink",
+   "name":"iot-aggregate-metrics-sensor-mongodb-sink",
    "config":{
       "connector.class":"com.mongodb.kafka.connect.MongoSinkConnector",
       "tasks.max":1,
-      "topics":"iot-aggregate-metrics",
+      "topics":"iot-aggregate-metrics-sensor",
       "connection.uri":"mongodb://devroot:devroot@mongo:27017",
       "database":"iot",
-      "collection":"iot_aggregate_metrics",
+      "collection":"iot_aggregate_metrics_sensor",
       "value.converter": "org.apache.kafka.connect.json.JsonConverter",
       "key.converter": "org.apache.kafka.connect.storage.StringConverter",
       "value.converter.schemas.enable": false,

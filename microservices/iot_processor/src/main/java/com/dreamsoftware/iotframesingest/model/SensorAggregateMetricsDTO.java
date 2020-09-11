@@ -1,6 +1,8 @@
 package com.dreamsoftware.iotframesingest.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.Serializable;
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,13 +18,25 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SensorAggregateMetricsDTO {
+public class SensorAggregateMetricsDTO implements Serializable {
 
     @JsonProperty("sensor_id")
     private String id;
 
     @JsonProperty("sensor_name")
     private String name;
+
+    @JsonProperty("start_agg")
+    private Date startAgg;
+
+    @JsonProperty("start_agg_tm")
+    private long startAggTm;
+
+    @JsonProperty("end_agg")
+    private Date endAgg;
+
+    @JsonProperty("end_agg_tm")
+    private long endAggTm;
 
     @JsonProperty("count_measures")
     private int countMeasures;

@@ -6,6 +6,7 @@ import com.dreamsoftware.iotframesingest.model.SensorKeyDTO;
 import com.dreamsoftware.iotframesingest.serde.SensorAggregateMetricsSerde;
 import com.dreamsoftware.iotframesingest.serde.SensorDataSerde;
 import java.time.Duration;
+import java.util.Date;
 import static org.apache.kafka.common.serialization.Serdes.String;
 import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.KeyValue;
@@ -23,33 +24,35 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Aggreate Metrics Processor
+ * Aggreate Metrics By Sensor Processor
  *
  * @author ssanchez
  */
 @Component
-public class AggregateMetricsProcessor {
+public class AggregateMetricsBySensorProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(AggregateMetricsProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(AggregateMetricsBySensorProcessor.class);
 
-    private final static int WINDOW_SIZE_IN_MINUTES = 1;
-    private final static String WINDOW_STORE_NAME = "aggregate-metrics-by-sensor";
+    private final static int WINDOW_SIZE_IN_MINUTES = 5;
+    private final static String WINDOW_STORE_NAME = "aggregate-metrics-by-sensor-tmp";
 
-    @Value("${kafka.topic.aggregate-metrics}")
-    private String outputTopic;
+    /**
+     * Agg Metrics Sensor Topic Output
+     */
+    @Value("${kafka.topic.aggregate-metrics-sensor}")
+    private String aggMetricsSensorOutput;
 
     /**
      *
      * @param stream
      */
     public void process(KStream<SensorKeyDTO, SensorDataDTO> stream) {
-
         buildAggregateMetricsBySensor(stream)
-                .to(outputTopic, Produced.with(String(), new SensorAggregateMetricsSerde()));
-
+                .to(aggMetricsSensorOutput, Produced.with(String(), new SensorAggregateMetricsSerde()));
     }
 
     /**
+     * Build Aggregate Metrics By Sensor Stream
      *
      * @param stream
      * @return
@@ -87,8 +90,15 @@ public class AggregateMetricsProcessor {
      * @return
      */
     private SensorAggregateMetricsDTO aggregateData(final SensorDataDTO v, final SensorAggregateMetricsDTO va) {
+        // Sensor Data
         va.setId(v.getId());
         va.setName(v.getName());
+        // Start Agg
+        if (va.getStartAgg() == null) {
+            final Date startAggAt = new Date();
+            va.setStartAgg(startAggAt);
+            va.setStartAggTm(startAggAt.getTime());
+        }
         va.setCountMeasures(va.getCountMeasures() + 1);
         // Temperature
         va.setSumTemperature(va.getSumTemperature() + v.getPayload().getTemperature());
@@ -102,6 +112,11 @@ public class AggregateMetricsProcessor {
         // Pressure
         va.setSumPressure(va.getSumPressure() + v.getPayload().getPressure());
         va.setAvgPressure(va.getSumPressure() / va.getCountMeasures());
+
+        // End Agg
+        final Date endAggAt = new Date();
+        va.setEndAgg(endAggAt);
+        va.setEndAggTm(endAggAt.getTime());
         return va;
     }
 

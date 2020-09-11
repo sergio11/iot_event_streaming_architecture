@@ -2,7 +2,7 @@ package com.dreamsoftware.iotframesingest.config;
 
 import com.dreamsoftware.iotframesingest.model.SensorDataDTO;
 import com.dreamsoftware.iotframesingest.model.SensorKeyDTO;
-import com.dreamsoftware.iotframesingest.processor.AggregateMetricsProcessor;
+import com.dreamsoftware.iotframesingest.processor.AggregateMetricsBySensorProcessor;
 import com.dreamsoftware.iotframesingest.serde.SensorDataSerde;
 import com.dreamsoftware.iotframesingest.serde.SensorKeySerde;
 import java.util.HashMap;
@@ -38,7 +38,7 @@ public class KafkaStreamsConfig {
     private String inputTopic;
 
     @Autowired
-    private AggregateMetricsProcessor aggregateMetricsProcessor;
+    private AggregateMetricsBySensorProcessor aggregateMetricsProcessor;
 
     /**
      * Provide KStreams Configs
@@ -66,7 +66,6 @@ public class KafkaStreamsConfig {
     @Bean
     public KStream<SensorKeyDTO, SensorDataDTO> provideKStream(StreamsBuilder kStreamBuilder) {
         final KStream<SensorKeyDTO, SensorDataDTO> stream = kStreamBuilder.stream(inputTopic);
-
         logger.debug("Start Aggregate Metrics Processor Stream");
         aggregateMetricsProcessor.process(stream);
         return stream;
