@@ -4,7 +4,7 @@ LABEL description="IoT Processor"
 # Args for image
 ARG PORT=8080
 
-RUN apk update && apk upgrade
+RUN apk update && apk upgrade && apk add --no-cache gcompat
 RUN ln -s /bin/bash /usr/bin
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
