@@ -34,6 +34,8 @@ public class IoTSensor implements Callable<Void> {
     private String sensorName;
     @Value("${sensor.id}")
     private String sensorId;
+    @Value("${sensor.place.id}")
+    private String sensorPlaceId;
 
     private final Random rnd = new Random();
 
@@ -75,6 +77,7 @@ public class IoTSensor implements Callable<Void> {
         final SensorDataDTO data = SensorDataDTO.builder()
                 .id(sensorId)
                 .name(sensorName)
+                .placeId(sensorPlaceId)
                 .date(new Date())
                 .timestamp(new Date().getTime())
                 .payload(SensorDataPayloadDTO.builder()

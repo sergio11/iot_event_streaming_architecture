@@ -1,9 +1,9 @@
 package com.dreamsoftware.iotframesingest.processor;
 
-import com.dreamsoftware.iotframesingest.model.SensorAggregateSensorMetricsDTO;
+import com.dreamsoftware.iotframesingest.model.SensorAggregatePlaceMetricsDTO;
 import com.dreamsoftware.iotframesingest.model.SensorDataDTO;
 import com.dreamsoftware.iotframesingest.model.SensorKeyDTO;
-import com.dreamsoftware.iotframesingest.serde.SensorAggregateMetricsSensorSerde;
+import com.dreamsoftware.iotframesingest.serde.SensorAggregateMetricsPlaceSerde;
 import com.dreamsoftware.iotframesingest.serde.SensorDataSerde;
 import java.time.Duration;
 import java.util.Date;
@@ -24,47 +24,47 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Aggreate Metrics By Sensor Processor
+ * Aggreate Metrics By Place Processor
  *
  * @author ssanchez
  */
 @Component
-public class AggregateMetricsBySensorProcessor {
+public class AggregateMetricsByPlaceProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(AggregateMetricsBySensorProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(AggregateMetricsByPlaceProcessor.class);
 
     private final static int WINDOW_SIZE_IN_MINUTES = 5;
-    private final static String WINDOW_STORE_NAME = "aggregate-metrics-by-sensor-tmp";
+    private final static String WINDOW_STORE_NAME = "aggregate-metrics-by-place-tmp";
 
     /**
-     * Agg Metrics Sensor Topic Output
+     * Agg Metrics Place Topic Output
      */
-    @Value("${kafka.topic.aggregate-metrics-sensor}")
-    private String aggMetricsSensorOutput;
+    @Value("${kafka.topic.aggregate-metrics-place}")
+    private String aggMetricsPlaceOutput;
 
     /**
      *
      * @param stream
      */
     public void process(KStream<SensorKeyDTO, SensorDataDTO> stream) {
-        buildAggregateMetricsBySensor(stream)
-                .to(aggMetricsSensorOutput, Produced.with(String(), new SensorAggregateMetricsSensorSerde()));
+        buildAggregateMetrics(stream)
+                .to(aggMetricsPlaceOutput, Produced.with(String(), new SensorAggregateMetricsPlaceSerde()));
     }
 
     /**
-     * Build Aggregate Metrics By Sensor Stream
+     * Build Aggregate Metrics Stream
      *
      * @param stream
      * @return
      */
-    private KStream<String, SensorAggregateSensorMetricsDTO> buildAggregateMetricsBySensor(KStream<SensorKeyDTO, SensorDataDTO> stream) {
+    private KStream<String, SensorAggregatePlaceMetricsDTO> buildAggregateMetrics(KStream<SensorKeyDTO, SensorDataDTO> stream) {
         return stream
-                .map((key, val) -> new KeyValue<>(val.getId(), val))
+                .map((key, val) -> new KeyValue<>(val.getPlaceId(), val))
                 .groupByKey(Grouped.with(String(), new SensorDataSerde()))
                 .windowedBy(TimeWindows.of(Duration.ofMinutes(WINDOW_SIZE_IN_MINUTES)).grace(Duration.ofMillis(0)))
-                .aggregate(SensorAggregateSensorMetricsDTO::new,
-                        (String k, SensorDataDTO v, SensorAggregateSensorMetricsDTO va) -> aggregateData(v, va),
-                         buildWindowPersistentStore()
+                .aggregate(SensorAggregatePlaceMetricsDTO::new,
+                        (String k, SensorDataDTO v, SensorAggregatePlaceMetricsDTO va) -> aggregateData(v, va),
+                        buildWindowPersistentStore()
                 )
                 .suppress(Suppressed.untilWindowCloses(unbounded()))
                 .toStream()
@@ -76,11 +76,11 @@ public class AggregateMetricsBySensorProcessor {
      *
      * @return
      */
-    private Materialized<String, SensorAggregateSensorMetricsDTO, WindowStore<Bytes, byte[]>> buildWindowPersistentStore() {
+    private Materialized<String, SensorAggregatePlaceMetricsDTO, WindowStore<Bytes, byte[]>> buildWindowPersistentStore() {
         return Materialized
-                .<String, SensorAggregateSensorMetricsDTO, WindowStore<Bytes, byte[]>>as(WINDOW_STORE_NAME)
+                .<String, SensorAggregatePlaceMetricsDTO, WindowStore<Bytes, byte[]>>as(WINDOW_STORE_NAME)
                 .withKeySerde(String())
-                .withValueSerde(new SensorAggregateMetricsSensorSerde());
+                .withValueSerde(new SensorAggregateMetricsPlaceSerde());
     }
 
     /**
@@ -90,12 +90,8 @@ public class AggregateMetricsBySensorProcessor {
      * @param va
      * @return
      */
-    private SensorAggregateSensorMetricsDTO aggregateData(final SensorDataDTO v, final SensorAggregateSensorMetricsDTO va) {
-        // Sensor Data
-        va.setId(v.getId());
-        // Sensor Data
-        va.setId(v.getId());
-        va.setName(v.getName());
+    private SensorAggregatePlaceMetricsDTO aggregateData(final SensorDataDTO v, final SensorAggregatePlaceMetricsDTO va) {
+        va.setPlaceId(v.getId());
         // Start Agg
         if (va.getStartAgg() == null) {
             final Date startAggAt = new Date();

@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SensorAggregateMetricsDTO implements Serializable {
+public class SensorAggregateSensorMetricsDTO implements Serializable {
 
     @JsonProperty("sensor_id")
     private String id;

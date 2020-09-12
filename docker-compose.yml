@@ -380,6 +380,7 @@ services:
     environment:
       - sensor.id=${IOT_SENSOR_1_ID}
       - sensor.name=${IOT_SENSOR_1_NAME}
+      - sensor.place.id=${IOT_SENSOR_1_PLACE_ID}
 
   # IoT Sensor 2
   iot_sensor_2:
@@ -389,6 +390,7 @@ services:
     environment:
       - sensor.id=${IOT_SENSOR_2_ID}
       - sensor.name=${IOT_SENSOR_2_NAME}
+      - sensor.place.id=${IOT_SENSOR_2_PLACE_ID}
       
 
   # IoT Processor

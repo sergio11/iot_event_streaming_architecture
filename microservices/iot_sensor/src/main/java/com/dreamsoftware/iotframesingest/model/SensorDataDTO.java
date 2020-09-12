@@ -25,6 +25,9 @@ public class SensorDataDTO {
     @JsonProperty("name")
     private String name;
 
+    @JsonProperty("place_id")
+    private String placeId;
+
     @JsonProperty("date")
     private Date date;
 
