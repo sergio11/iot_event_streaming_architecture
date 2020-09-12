@@ -1,11 +1,7 @@
 #!/bin/bash
 
-# Taken from https://github.com/grafana/grafana-docker/issues/74
-
 # Script to configure grafana datasources and dashboards.
 # Intended to be run before grafana entrypoint...
-# Image: grafana/grafana:4.1.2
-# ENTRYPOINT [\"/run.sh\"]"
 
 GRAFANA_URL=${GRAFANA_URL:-http://$GF_SECURITY_ADMIN_USER:$GF_SECURITY_ADMIN_PASSWORD@localhost:3000}
 #GRAFANA_URL=http://grafana-plain.k8s.playground1.aws.ad.zopa.com
@@ -21,7 +17,7 @@ grafana_api() {
   local response
   local cmd
 
-  cmd="curl -L -s --fail -H \"Accept: application/json\" -H \"Content-Type: application/json\" -X ${verb} -k ${GRAFANA_URL}${url}"
+  cmd="curl --verbose -L -s --fail -H \"Accept: application/json\" -H \"Content-Type: application/json\" -X ${verb} -k ${GRAFANA_URL}${url}"
   [[ -n "${params}" ]] && cmd="${cmd} -d \"${params}\""
   [[ -n "${bodyfile}" ]] && cmd="${cmd} --data @${bodyfile}"
   echo "Running ${cmd}"
