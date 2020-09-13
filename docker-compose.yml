@@ -291,7 +291,6 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/datasources:/etc/grafana/datasources
       - ./grafana/dashboards:/etc/grafana/dashboards
-      - ./grafana/plugins:/var/lib/grafana/plugins
       - ./grafana/setup.sh:/setup.sh
     entrypoint: /setup.sh
     environment:
