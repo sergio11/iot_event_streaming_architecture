@@ -170,6 +170,8 @@ services:
         /data/scripts/create_mongo_sink.sh 
         echo -e "\n--\n+> Creating MQTT Source Connect Current PATH ($$PWD)"
         /data/scripts/create_mqtt_source.sh
+        echo -e "\n--\n+> Creating Kafka Connect Prometheus sink Current PATH ($$PWD)"
+        /data/scripts/create_prometheus_sink.sh
         sleep infinity
     # kafka-connect relies upon Kafka and ZooKeeper.
     # This will instruct docker to wait until those services are up
@@ -289,6 +291,7 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/datasources:/etc/grafana/datasources
       - ./grafana/dashboards:/etc/grafana/dashboards
+      - ./grafana/plugins:/var/lib/grafana/plugins
       - ./grafana/setup.sh:/setup.sh
     entrypoint: /setup.sh
     environment:
@@ -398,6 +401,8 @@ services:
     image: ssanchez11/iot_processor:0.0.1-SNAPSHOT
     container_name: iot_processor
     restart: unless-stopped
+    ports:
+      - '8080:8080'
       
   pushgateway:
     image: prom/pushgateway:v0.8.0

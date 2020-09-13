@@ -1,0 +1,19 @@
+{
+  "name" : "prometheus-connector-sink",
+  "config" : {
+   "topics":"iot-metrics-time-series",
+   "connector.class" : "io.confluent.connect.prometheus.PrometheusMetricsSinkConnector",
+   "tasks.max" : "1",
+   "confluent.topic.bootstrap.servers":"kafka:9092",
+   "prometheus.scrape.url": "http://0.0.0.0:8084/iot-metrics-time-series",
+   "prometheus.listener.url": "http://0.0.0.0:8084/iot-metrics-time-series",
+   "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+   "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+   "value.converter.schemas.enable": false,
+   "key.converter.schemas.enable":false,
+   "reporter.bootstrap.servers": "kafka:9092",
+   "reporter.result.topic.replication.factor": "1",
+   "reporter.error.topic.replication.factor": "1",
+   "behavior.on.error": "log"
+  }
+}

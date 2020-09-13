@@ -4,6 +4,7 @@ import com.dreamsoftware.iotframesingest.model.SensorDataDTO;
 import com.dreamsoftware.iotframesingest.model.SensorKeyDTO;
 import com.dreamsoftware.iotframesingest.processor.AggregateMetricsBySensorProcessor;
 import com.dreamsoftware.iotframesingest.processor.AggregateMetricsByPlaceProcessor;
+import com.dreamsoftware.iotframesingest.processor.MetricsTimeSeriesProcessor;
 import com.dreamsoftware.iotframesingest.serde.SensorDataSerde;
 import com.dreamsoftware.iotframesingest.serde.SensorKeySerde;
 import java.util.HashMap;
@@ -51,6 +52,12 @@ public class KafkaStreamsConfig {
     private AggregateMetricsByPlaceProcessor aggregateMetricsByPlaceProcessor;
 
     /**
+     * Metrics Time Series Processor
+     */
+    @Autowired
+    private MetricsTimeSeriesProcessor metricsTimeSeriesProcessor;
+
+    /**
      * Provide KStreams Configs
      *
      * @param kafkaProperties
@@ -80,6 +87,8 @@ public class KafkaStreamsConfig {
         aggregateMetricsBySensorProcessor.process(stream);
         logger.debug("Start Aggregate Metrics By Place Processor Stream");
         aggregateMetricsByPlaceProcessor.process(stream);
+        logger.debug("Metrics Time Series Processor Stream");
+        metricsTimeSeriesProcessor.process(stream);
         return stream;
     }
 

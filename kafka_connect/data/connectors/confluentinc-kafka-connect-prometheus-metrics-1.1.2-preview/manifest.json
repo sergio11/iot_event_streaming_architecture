@@ -1,0 +1,28 @@
+{
+  "name" : "kafka-connect-prometheus-metrics",
+  "version" : "1.1.2-preview",
+  "title" : "Kafka Connect Prometheus Connector",
+  "description" : "A Kafka Connect plugin for Prometheus",
+  "owner" : {
+    "username" : "confluentinc",
+    "name" : "Confluent, Inc."
+  },
+  "support" : {
+    "summary" : "Confluent is introducing this preview connector to\ngain early feedback from developers. It should only be used for\nevaluation and non-production testing purposes or to provide\nfeedback to Confluent and is subject to the\n<a href=\"https://www.confluent.io/confluent-software-evaluation-license/\">Confluent Software Evaluation License.</a>\nConfluent will provide support for this connector for evaluation and non-production testing purposes.\n\nComments, questions and suggestions related to preview features\nare encouraged. Confluent customers may submit questions and suggestions, and file support tickets via the\n<a href=\"https://support.confluent.io/\">Confluent Support Portal.</a>"
+  },
+  "tags" : [ "Metrics", "Prometheus" ],
+  "features" : {
+    "supported_encodings" : [ "any" ],
+    "single_message_transforms" : true,
+    "confluent_control_center_integration" : true,
+    "kafka_connect_api" : true
+  },
+  "documentation_url" : "https://docs.confluent.io/current/connect/kafka-connect-prometheus-metrics/",
+  "docker_image" : { },
+  "license" : [ {
+    "name" : "Confluent Software Evaluation License",
+    "url" : "https://www.confluent.io/software-evaluation-license"
+  } ],
+  "component_types" : [ "sink" ],
+  "release_date" : "2020-06-08"
+}

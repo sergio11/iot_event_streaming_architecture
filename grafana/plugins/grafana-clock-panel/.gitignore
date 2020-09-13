@@ -1,0 +1,4 @@
+node_modules
+dist/
+ci-work/
+coverage/

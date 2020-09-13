@@ -21,3 +21,22 @@ kafka:
     input: iot-frames
     aggregate-metrics-sensor: iot-aggregate-metrics-sensor
     aggregate-metrics-place: iot-aggregate-metrics-place
+    metrics-time-series: iot-metrics-time-series
+---
+info:
+    app:
+        name: @project.name@
+        description: @project.description@
+        version: @project.version@
+        encoding: @project.build.sourceEncoding@
+        java:
+            version: @java.version@
+---
+management:
+    endpoint:
+        shutdown:
+            enabled: true
+        health:
+            show-details: always
+        web:
+            exposure.include: '*'

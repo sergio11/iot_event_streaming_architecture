@@ -15,15 +15,21 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
       
-  - job_name: 'teveo-actuator'
+  - job_name: 'iot-processor'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['teveoplatform:8080']
+      - targets: ['iot_processor:8080']
       
   - job_name: 'nodeexporter'
     scrape_interval: 5s
     static_configs:
       - targets: ['nodeexporter:9100']
+
+  - job_name: 'iot-metrics-time-series'
+    metrics_path: '/iot-metrics-time-series'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['kafka-connect:8084']
 
   - job_name: 'cadvisor'
     scrape_interval: 5s
