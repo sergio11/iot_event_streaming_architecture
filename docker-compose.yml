@@ -394,6 +394,15 @@ services:
       - sensor.name=${IOT_SENSOR_2_NAME}
       - sensor.place.id=${IOT_SENSOR_2_PLACE_ID}
       
+  # IoT Sensor 3
+  iot_sensor_3:
+    image: ssanchez11/iot_sensor:0.0.1-SNAPSHOT
+    container_name: iot_sensor_3
+    restart: unless-stopped
+    environment:
+      - sensor.id=${IOT_SENSOR_3_ID}
+      - sensor.name=${IOT_SENSOR_3_NAME}
+      - sensor.place.id=${IOT_SENSOR_3_PLACE_ID}
 
   # IoT Processor
   iot_processor:

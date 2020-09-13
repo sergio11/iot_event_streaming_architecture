@@ -26,6 +26,9 @@ public class MetricsTimeSeriesProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(MetricsTimeSeriesProcessor.class);
 
+    private final static String SENSOR_TIME_SERIE_NAME = "sample_sensor_metric";
+    private final static String SENSOR_TIME_SERIE_TYPE = "sensor";
+
     /**
      * Metrics Time Series
      */
@@ -50,9 +53,9 @@ public class MetricsTimeSeriesProcessor {
      */
     private SensorTimeSerieMetricDTO buildSensorTimeSerieMetric(final SensorDataDTO sensorData) {
         return SensorTimeSerieMetricDTO.builder()
-                .name("sample_sensor_metric")
+                .name(SENSOR_TIME_SERIE_NAME)
                 .timestamp(new Date().getTime())
-                .type("sensor")
+                .type(SENSOR_TIME_SERIE_TYPE)
                 .dimensions(SensorTimeSerieMetricDimensionsDTO.builder()
                         .placeId(sensorData.getPlaceId())
                         .sensorId(sensorData.getId())
