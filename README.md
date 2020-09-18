@@ -19,6 +19,7 @@ Internet of Things (IoT) and Event Streaming at Scale with Apache Kafka and MQTT
 * Grafana.
 * Eclipse Mosquitto.
 * MongoDB.
+* Mongo DB Express (Web-based MongoDB admin interface, written with Node.js and express).
 * Cadvisor (Analyzes resource usage and performance characteristics of running containers).
 * kafka-exporter (Kafka exporter for Prometheus).
 
@@ -44,6 +45,18 @@ The available tasks are detailed below (rake --task)
 
 
 To start the platform make sure you have Ruby installed, go to the root directory of the project and run the `rake deploy` task, this task will carry out a series of preliminary checks, discard images and volumes that are no longer necessary and also proceed to download all the images and the initialization of the containers.
+
+  ### Containers Ports
+
+| Container | Port |
+| ------ | ------ |
+| kafka-topics-ui | localhost:8081 |
+| kafka-connect-ui | localhost:8082 |
+| zoonavigator-web | localhost:8083 |
+| mongo-express | localhost:8084 |
+| grafana | localhost:8085 |
+| prometheus | localhost:8086 |
+| kafka-rest-proxy | localhost:9999 |
 
 ## Some screenshots
 
