@@ -76,4 +76,4 @@ To start the platform make sure you have Ruby installed, go to the root director
 
 ### Viewing Zookeeper Nodes through ZooNavigator
 
-<img width="auto" src="./screenshots/zooNavigator_1.PNG" />
+<img width="auto" src="./screenshots/zoonavigator_1.PNG" />
