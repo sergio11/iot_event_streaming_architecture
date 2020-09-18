@@ -84,8 +84,15 @@ To start the platform make sure you have Ruby installed, go to the root director
 <img width="auto" src="./screenshots/mongo_express_2.PNG" />
 <img width="auto" src="./screenshots/mongo_express_3.PNG" />
 
-<img width="auto" src="./screenshots/grafana_1.PNG" />
+### Viewing the metrics of the IoT sensors simulated on the platform.
 
+<img width="auto" src="./screenshots/grafana_1.PNG" />
 <img width="auto" src="./screenshots/grafana_2.PNG" />
+
+### Viewing metrics about Kafka's performance.
+<img width="auto" src="./screenshots/grafana_3.PNG" />
+
+### Viewing platform container metrics.
+<img width="auto" src="./screenshots/grafana_4.PNG" />
 
 
