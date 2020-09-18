@@ -77,3 +77,9 @@ To start the platform make sure you have Ruby installed, go to the root director
 ### Viewing Zookeeper Nodes through ZooNavigator
 
 <img width="auto" src="./screenshots/zoonavigator_1.PNG" />
+
+### Viewing information consolidated and processed in Mongodb through Mongo Express.
+
+<img width="auto" src="./screenshots/mongo_express_1.PNG" />
+<img width="auto" src="./screenshots/mongo_express_2.PNG" />
+<img width="auto" src="./screenshots/mongo_express_1.PNG" />
