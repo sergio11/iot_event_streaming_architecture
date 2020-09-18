@@ -68,3 +68,8 @@ To start the platform make sure you have Ruby installed, go to the root director
 
 <img width="auto" src="./screenshots/kafka_topics_1.PNG" />
 <img width="auto" src="./screenshots/kafka_topics_2.PNG" />
+
+### Viewing Connect Topology through Landoop Kafka Connect UI
+
+<img width="auto" src="./screenshots/kafka_connect_1.PNG" />
+<img width="auto" src="./screenshots/kafka_connect_2.PNG" />
