@@ -26,12 +26,12 @@ The available tasks are detailed below (rake --task)
 | check_deployment_file_task | Check Deployment File |
 | check_docker_task | Check Docker and Docker Compose Task |
 | cleaning_environment_task | Cleaning Evironment Task |
-| deploy | Deploys the Covid Tweets Architecture and laun... |
+| deploy | Deploys the IoT Event Streaming Architecture and laun... |
 | login | Authenticating with existing credentials |
 | start | Start Containers |
 | status | Status Containers |
 | stop | Stop Containers |
-| undeploy | UnDeploy Covid Tweets Architecture |
+| undeploy | UnDeploy IoT Event Streaming Architecture |
 
 
 To start the platform make sure you have Ruby installed, go to the root directory of the project and run the `rake deploy` task, this task will carry out a series of preliminary checks, discard images and volumes that are no longer necessary and also proceed to download all the images and the initialization of the containers.
