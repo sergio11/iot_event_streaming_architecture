@@ -73,3 +73,7 @@ To start the platform make sure you have Ruby installed, go to the root director
 
 <img width="auto" src="./screenshots/kafka_connect_1.PNG" />
 <img width="auto" src="./screenshots/kafka_connect_2.PNG" />
+
+### Viewing Zookeeper Nodes through ZooNavigator
+
+<img width="auto" src="./screenshots/zooNavigator_1.PNG" />
