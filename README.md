@@ -11,8 +11,17 @@ Internet of Things (IoT) and Event Streaming at Scale with Apache Kafka and MQTT
 * Micrometer Registry Prometheus.
 * Eclipse Paho MQTT Client.
 * Kafka Connect.
+* Kafka Rest Proxy
 * lombok.
 * Jackson.
+* NodeExporter (Exporter for machine metrics).
+* Prometheus.
+* Grafana.
+* Eclipse Mosquitto.
+* MongoDB.
+* Cadvisor (Analyzes resource usage and performance characteristics of running containers).
+* kafka-exporter (Kafka exporter for Prometheus).
+
 
 ## Running Applications as Docker containers.
 
