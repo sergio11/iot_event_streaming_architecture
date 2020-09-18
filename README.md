@@ -41,3 +41,8 @@ To start the platform make sure you have Ruby installed, go to the root director
 ### Deploy with Docker Compose.
 
 <img width="auto" src="./screenshots/platform_containers.PNG" />
+
+### Viewing topics through Landoop Kafka Topics UI
+
+<img width="auto" src="./screenshots/kafka_topics_1.PNG" />
+<img width="auto" src="./screenshots/kafka_topics_2.PNG" />
