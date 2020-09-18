@@ -83,3 +83,9 @@ To start the platform make sure you have Ruby installed, go to the root director
 <img width="auto" src="./screenshots/mongo_express_1.PNG" />
 <img width="auto" src="./screenshots/mongo_express_2.PNG" />
 <img width="auto" src="./screenshots/mongo_express_3.PNG" />
+
+<img width="auto" src="./screenshots/grafana_1.PNG" />
+
+<img width="auto" src="./screenshots/grafana_2.PNG" />
+
+
