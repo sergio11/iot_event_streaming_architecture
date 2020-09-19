@@ -403,9 +403,9 @@ services:
       - sensor.place.id=${IOT_SENSOR_3_PLACE_ID}
 
   # IoT Processor
-  iot_processor:
+  iot-processor:
     image: ssanchez11/iot_processor:0.0.1-SNAPSHOT
-    container_name: iot_processor
+    container_name: iot-processor
     restart: unless-stopped
     ports:
       - '8080:8080'
