@@ -97,6 +97,7 @@ To start the platform make sure you have Ruby installed, go to the root director
 <img width="auto" src="./screenshots/mongo_express_1.PNG" />
 <img width="auto" src="./screenshots/mongo_express_2.PNG" />
 <img width="auto" src="./screenshots/mongo_express_4.PNG" />
+<img width="auto" src="./screenshots/mongo_express_5.PNG" />
 
 ### Viewing the metrics of the IoT sensors simulated on the platform.
 
