@@ -16,6 +16,14 @@ spring:
       key-deserializer: com.dreamsoftware.iotframesingest.serde.SensorKeySerializer
       value-deserializer: com.dreamsoftware.iotframesingest.serde.SensorDataDeserializer
 ---
+spring:
+  security:
+    user:
+      name: prometheus
+      password: prometheus
+
+---
+
 kafka:
   topic:
     input: iot-frames
@@ -33,10 +41,14 @@ info:
             version: @java.version@
 ---
 management:
-    endpoint:
-        shutdown:
-            enabled: true
-        health:
-            show-details: always
-        web:
-            exposure.include: '*'
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+    jmx:
+      exposure:
+        include: '*'

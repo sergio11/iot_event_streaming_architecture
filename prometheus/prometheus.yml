@@ -18,7 +18,10 @@ scrape_configs:
   - job_name: 'iot-processor'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['iot_processor:8080']
+      - targets: ['iot-processor:8080']
+    basic_auth:
+      username: "prometheus"
+      password: "prometheus"
       
   - job_name: 'nodeexporter'
     scrape_interval: 5s
