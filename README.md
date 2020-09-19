@@ -8,10 +8,10 @@ Project developed to practice what I have learned in the Udemy course [Apache Ka
 
 The objectives of this architecture are the following:
 
-• Ingest and store real-time data from IoT sensors located in various locations.
-• Analyze and make aggregations through rotating time windows to know average temperature by sensor or place, in addition to humidity, pressure and luminosity.
-• Store data after processing for subsequent monitoring in a NOSQL database with good performance for frequent writes for relatively homogeneous document sizes such as MongoDB.
-• Visualization of the metrics of the sensors in real time and of the performance of the components of the architecture through Grafana and the consolidated documents in MongoDB through Mongo-Express.
+* Ingest and store real-time data from IoT sensors located in various locations.
+* Analyze and make aggregations through rotating time windows to know average temperature by sensor or place, in addition to humidity, pressure and luminosity.
+* Store data after processing for subsequent monitoring in a NOSQL database with good performance for frequent writes for relatively homogeneous document sizes such as MongoDB.
+* Visualization of the metrics of the sensors in real time and of the performance of the components of the architecture through Grafana and the consolidated documents in MongoDB through Mongo-Express.
 
 <img width="auto" src="./iot_streaming_architecture.png" />
 
