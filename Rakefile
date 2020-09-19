@@ -1,7 +1,7 @@
 task default: %w[deploy]
 
 
-desc "Deploys Covid Tweets ETL Architecture and launches all services and daemons needed to properly work"
+desc "Deploys IoT Event Streaming Architecture and launches all services and daemons needed to properly work"
 task :deploy => [
 	:cleaning_environment_task,
 	:start,
@@ -9,7 +9,7 @@ task :deploy => [
     puts "Deploying services..."
 end
 
-desc "UnDeploy Covid Tweets ETL Architecture"
+desc "UnDeploy IoT Event Streaming Architecture"
 task :undeploy => [:status] do 
 	puts "Undeploy Services"
 	puts `docker-compose down -v 2>&1`
