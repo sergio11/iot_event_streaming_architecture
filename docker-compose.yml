@@ -164,8 +164,6 @@ services:
           sleep 5 
         done
         nc -vz $$CONNECT_REST_ADVERTISED_HOST_NAME $$CONNECT_REST_PORT
-        echo -e "\n--\n+> Creating IoT Frames Topic"
-        /data/scripts/create_iot_frames_topic.sh 
         echo -e "\n--\n+> Creating Kafka Connect MongoDB sink Current PATH ($$PWD)"
         /data/scripts/create_mongo_sink.sh 
         echo -e "\n--\n+> Creating MQTT Source Connect Current PATH ($$PWD)"

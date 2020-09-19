@@ -23,9 +23,6 @@ public class SensorAggregatePlaceMetricsDTO implements Serializable {
     @JsonProperty("place_id")
     private String placeId;
 
-    @JsonProperty("sensor_count")
-    private long sensorCount;
-
     @JsonProperty("start_agg")
     private Date startAgg;
 
