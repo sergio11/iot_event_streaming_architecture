@@ -4,6 +4,8 @@ Internet of Things (IoT) and Event Streaming at Scale with Apache Kafka and MQTT
 Project developed to practice what I have learned in the Udemy course [Apache Kafka Series - Kafka Connect Hands-on Learning](https://www.udemy.com/course/kafka-connect/) and 
 [Apache Kafka Series - Kafka Streams for Data Processing](https://www.udemy.com/course/kafka-streams/).
 
+Also you can read more detail information about this project [in this Medium article](https://medium.com/@sanchezsanchezsergio418/iot-event-streaming-architecture-fb790c634c2f).
+
 ## Architecture Overview
 
 The objectives of this architecture are the following:
