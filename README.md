@@ -8,7 +8,7 @@ Also you can read more detail information about this project [in this Medium art
 
 ## Architecture Overview
 
-The objectives of this architecture are the following:
+The main goals of this architecture are the following:
 
 * Ingest and store real-time data from IoT sensors located in various locations.
 * Analyze and make aggregations through rotating time windows to know average temperature by sensor or place, in addition to humidity, pressure and luminosity.
