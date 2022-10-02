@@ -112,4 +112,8 @@ To start the platform make sure you have Ruby installed, go to the root director
 ### Viewing platform container metrics.
 <img width="auto" src="./screenshots/grafana_4.PNG" />
 
+## Visitors Count
+
+<img width="auto" src="https://profile-counter.glitch.me/iot_event_streaming_architecture/count.svg" />
+
 
