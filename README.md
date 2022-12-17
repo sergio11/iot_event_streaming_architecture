@@ -116,4 +116,12 @@ To start the platform make sure you have Ruby installed, go to the root director
 
 <img width="auto" src="https://profile-counter.glitch.me/iot_event_streaming_architecture/count.svg" />
 
+## Please Share & Star the repository to keep me motivated.
+  <a href = "https://github.com/sergio11/iot_event_streaming_architecture/stargazers">
+     <img src = "https://img.shields.io/github/stars/sergio11/iot_event_streaming_architecture" />
+  </a>
+  <a href = "https://twitter.com/SergioReact418">
+     <img src = "https://img.shields.io/twitter/url?label=follow&style=social&url=https%3A%2F%2Ftwitter.com%2FSergioReact418" />
+  </a>
+
 
