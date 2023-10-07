@@ -1,10 +1,19 @@
-# IoT Event Streaming Architecture
-Internet of Things (IoT) and Event Streaming at Scale with Apache Kafka and MQTT.
+# Smart IoT Event Streaming: Scaling with Apache Kafka and MQTT 🌐📊
+
+Unlock the potential of the Internet of Things (IoT) with this cutting-edge Event Streaming Architecture. Leveraging the power of Apache Kafka and MQTT, this project is designed to handle IoT data at scale. 🚀
+
+Ingest real-time data from IoT sensors across diverse locations, analyze metrics like temperature, humidity, pressure, and luminosity, and store them efficiently in a high-performance MongoDB database. 🌡️💧📈
+
+The technology stack includes Spring Boot, Kafka Streams, Micrometer, and Grafana for real-time monitoring, making this architecture a powerhouse for IoT solutions. 💻📈🔍
+
+With Docker containerization, deployment is a breeze. Explore this project, visualize IoT data, and gain insights into your sensor networks. 🐳🚀📊
+
+Check out the detailed [Medium article]([link_to_medium_article](https://medium.com/@sanchezsanchezsergio418/iot-event-streaming-architecture-fb790c634c2f)) for a comprehensive overview. 📖
+
+Thank you for visiting the Smart IoT Event Streaming GitHub repository! Empower your IoT endeavors and scale with confidence. 🌐📈💡
 
 Project developed to practice what I have learned in the Udemy course [Apache Kafka Series - Kafka Connect Hands-on Learning](https://www.udemy.com/course/kafka-connect/) and 
 [Apache Kafka Series - Kafka Streams for Data Processing](https://www.udemy.com/course/kafka-streams/).
-
-Also you can read more detail information about this project [in this Medium article](https://medium.com/@sanchezsanchezsergio418/iot-event-streaming-architecture-fb790c634c2f).
 
 ## Architecture Overview
 
@@ -39,13 +48,11 @@ The main goals of this architecture are the following:
 * Cadvisor (Analyzes resource usage and performance characteristics of running containers).
 * kafka-exporter (Kafka exporter for Prometheus).
 
-
 ## Running Applications as Docker containers.
 
 ### Rake Tasks
 
 The available tasks are detailed below (rake --task)
-
 
 | Task | Description |
 | ------ | ------ |
