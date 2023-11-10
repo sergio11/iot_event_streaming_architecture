@@ -1,5 +1,7 @@
 # QuantumFlow IoT: Smart IoT Event Streaming. Scaling with Apache Kafka and MQTT 🌐📊
 
+<img width="300px" align="left" src="./logo.PNG" />
+
 Unlock the potential of the Internet of Things (IoT) with this cutting-edge Event Streaming Architecture. Leveraging the power of Apache Kafka and MQTT, this project is designed to handle IoT data at scale. 🚀
 
 Ingest real-time data from IoT sensors across diverse locations, analyze metrics like temperature, humidity, pressure, and luminosity, and store them efficiently in a high-performance MongoDB database. 🌡️💧📈
@@ -14,6 +16,16 @@ Thank you for visiting the Smart IoT Event Streaming GitHub repository! Empower 
 
 Project developed to practice what I have learned in the Udemy course [Apache Kafka Series - Kafka Connect Hands-on Learning](https://www.udemy.com/course/kafka-connect/) and 
 [Apache Kafka Series - Kafka Streams for Data Processing](https://www.udemy.com/course/kafka-streams/).
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Apache_Kafka-231F20?style=for-the-badge&logo=apache-kafka&logoColor=white" />
+  <img src="https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white" />
+  <img src="https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white" />
+  <img src="https://img.shields.io/badge/Prometheus-000000?style=for-the-badge&logo=prometheus&labelColor=000000" />
+  <img src="https://img.shields.io/badge/Grafana-F2F4F9?style=for-the-badge&logo=grafana&logoColor=orange&labelColor=F2F4F9" />
+  <img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white" />
+  <img src="https://img.shields.io/badge/Spring_Boot-F2F4F9?style=for-the-badge&logo=spring-boot" />
+</p>
 
 ## Architecture Overview
 
