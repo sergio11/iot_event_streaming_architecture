@@ -1,4 +1,4 @@
-# Smart IoT Event Streaming: Scaling with Apache Kafka and MQTT 🌐📊
+# QuantumFlow IoT: Smart IoT Event Streaming. Scaling with Apache Kafka and MQTT 🌐📊
 
 Unlock the potential of the Internet of Things (IoT) with this cutting-edge Event Streaming Architecture. Leveraging the power of Apache Kafka and MQTT, this project is designed to handle IoT data at scale. 🚀
 
