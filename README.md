@@ -27,6 +27,14 @@ Project developed to practice what I have learned in the Udemy course [Apache Ka
   <img src="https://img.shields.io/badge/Spring_Boot-F2F4F9?style=for-the-badge&logo=spring-boot" />
 </p>
 
+## ⚠️ Disclaimer:
+
+This project, **QuantumFlow IoT**, has been developed **for educational purposes only**. Its primary objective is to provide a hands-on learning experience for building scalable event streaming architectures and processing real-time IoT data using technologies like **Apache Kafka**, **MQTT**, **MongoDB**, **Grafana**, and **Spring Boot**.
+
+This repository demonstrates how to ingest, process, and store data from IoT sensors, and it does not provide access to real-world IoT data or production-grade sensor networks. The project uses **simulated data** for demonstration purposes, allowing users to explore the design and architecture of IoT solutions without the need for live sensor deployments.
+
+The name **QuantumFlow IoT** was generated during a **brainstorming session** with the help of **AI**, and any resemblance to existing brands or services is purely **coincidental**.
+
 ## Architecture Overview
 
 The main goals of this architecture are the following:
@@ -130,6 +138,14 @@ To start the platform make sure you have Ruby installed, go to the root director
 
 ### Viewing platform container metrics.
 <img width="auto" src="./screenshots/grafana_4.PNG" />
+
+## ⚠️ Disclaimer:
+
+This project, **QuantumFlow IoT**, has been developed **for educational purposes only**. Its primary objective is to provide a hands-on learning experience for building scalable event streaming architectures and processing real-time IoT data using technologies like **Apache Kafka**, **MQTT**, **MongoDB**, **Grafana**, and **Spring Boot**.
+
+This repository demonstrates how to ingest, process, and store data from IoT sensors, and it does not provide access to real-world IoT data or production-grade sensor networks. The project uses **simulated data** for demonstration purposes, allowing users to explore the design and architecture of IoT solutions without the need for live sensor deployments.
+
+The name **QuantumFlow IoT** was generated during a **brainstorming session** with the help of **AI**, and any resemblance to existing brands or services is purely **coincidental**.
 
 ## Visitors Count
 
