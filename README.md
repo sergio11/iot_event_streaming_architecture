@@ -47,7 +47,7 @@ The main goals of this architecture are the following:
 * Visualization of the metrics of the sensors in real time and of the performance of the components of the architecture through Grafana and the consolidated documents in MongoDB through Mongo-Express.
 
 <img width="auto" src="./iot_streaming_architecture.png" />
-
+*Diagram created with [diagrams.net](https://www.diagrams.net/)*
 
 ## Used technology
 
